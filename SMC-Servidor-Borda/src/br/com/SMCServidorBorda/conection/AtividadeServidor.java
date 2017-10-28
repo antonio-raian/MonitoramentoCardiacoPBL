@@ -47,7 +47,6 @@ public class AtividadeServidor extends Thread{
         this.ctrl = ctrl;//Seta o objeto que contem as informações do Sistema
         this.entradaUDP = packet; //Recebe o pacote enviado ao servidor
         clienteUDP = socket;//Recebe o meio de comunicação com o cliente
-        
         System.out.println("Conectou");
         
         System.out.println("Cliente UDP: "+entradaUDP.getAddress()+":"+entradaUDP.getPort());
