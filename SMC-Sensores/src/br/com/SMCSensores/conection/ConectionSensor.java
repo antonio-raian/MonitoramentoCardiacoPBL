@@ -6,9 +6,12 @@
 package br.com.SMCSensores.conection;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.Socket;
 import java.net.UnknownHostException;
 
 /**
@@ -17,9 +20,12 @@ import java.net.UnknownHostException;
  */
 //Classe resopnsável por fazer a conexão das telas com o servidor
 public class ConectionSensor{
-    private DatagramSocket server; //Objeto responsável pela conexão com o servidor
-    private byte[] saida; //Objeto que envia informação para o servidor
-    private final byte[] entrada = new byte[1024]; //Objeto que recebe informação do servidor
+    private Socket serverTCP;
+    private ObjectOutputStream saidaTCP;
+    private ObjectInputStream entradaTCP;
+    private DatagramSocket serverUDP; //Objeto responsável pela conexão com o servidor
+    private byte[] saidaUDP; //Objeto que envia informação para o servidor
+    private final byte[] entradaUDP = new byte[1024]; //Objeto que recebe informação do servidor
     private final InetAddress endereco; //Variavel q armazena o endereço da conexão
     private final int porta;//Variável que armazena a porta da conexão
 
@@ -32,13 +38,13 @@ public class ConectionSensor{
     //O meio de comunicação com o servidor são sempre Strings com o formato:
     //SOLICITANTE#COMANDO#DADOS, se houver mais de um dado eles são enviados separados por "#"
     //Metodo que solicita o armazenamento de um novo paciente no sistema
-    public String salvarSensor (String nick, String nome, int move, int ritmo, int sistole, int diastole) throws IOException, ClassNotFoundException{
+    public String salvarSensor (String nick, String nome, String senha) throws IOException, ClassNotFoundException{
         //Concatena todas as infomações numa String e a transforma em uma cadeia de bytes
-        saida = ("SENSOR#SALVAR#"+nick+"#"+nome+"#"+move+"#"+ritmo+"#"+sistole+"#"+diastole).getBytes();
+        saidaUDP = ("SENSOR#SALVAR#"+nick+"#"+nome+"#"+senha).getBytes();
         //Cria um pacote para envio ao servidor
-        DatagramPacket sendInfo = new DatagramPacket(saida, saida.length, endereco, porta);
-        server.send(sendInfo);//Envia o pacote ao servidor
-        server.receive(sendInfo);//Espera uma resposta
+        DatagramPacket sendInfo = new DatagramPacket(saidaUDP, saidaUDP.length, endereco, porta);
+        serverUDP.send(sendInfo);//Envia o pacote ao servidor
+        serverUDP.receive(sendInfo);//Espera uma resposta
         
         return new String(sendInfo.getData(),0,sendInfo.getLength()); // retorna informação pra View
     }
@@ -46,11 +52,11 @@ public class ConectionSensor{
     //Metodo que solicita a atualização de um paciente no sistema
     public String atualizarSensor (String nick, String nome, int move, int ritmo, int sistole, int diastole) throws IOException, ClassNotFoundException{
         //Concatena todas as infomações numa String e a transforma em uma cadeia de bytes
-        saida = ("SENSOR#ATUALIZAR#"+nick+"#"+nome+"#"+move+"#"+ritmo+"#"+sistole+"#"+diastole).getBytes();
+        saidaUDP = ("SENSOR#ATUALIZAR#"+nick+"#"+nome+"#"+move+"#"+ritmo+"#"+sistole+"#"+diastole).getBytes();
         //Cria um pacote para envio ao servidor
-        DatagramPacket sendInfo = new DatagramPacket(saida, saida.length, endereco, porta);
-        server.send(sendInfo);//Envia o pacote ao servidor
-        server.receive(sendInfo);//Espera uma resposta
+        DatagramPacket sendInfo = new DatagramPacket(saidaUDP, saidaUDP.length, endereco, porta);
+        serverUDP.send(sendInfo);//Envia o pacote ao servidor
+        serverUDP.receive(sendInfo);//Espera uma resposta
         
         return new String(sendInfo.getData(),0,sendInfo.getLength()); // retorna informação pra View
     }
@@ -58,12 +64,12 @@ public class ConectionSensor{
     //Metodo que solicita uma lista de todos os pacientes do sistema
     public String listarSensores () throws IOException, ClassNotFoundException{
         //Concatena as informações necessárias para coletar a lista
-        saida = ("SENSOR#LISTAR#").getBytes();
+        saidaUDP = ("SENSOR#LISTAR#").getBytes();
         //Cria um pacote para envio ao servidor
-        DatagramPacket sendInfo = new DatagramPacket(saida, saida.length, endereco, porta);
-        server.send(sendInfo);//Envia o pacote ao servidor
-        sendInfo = new DatagramPacket(entrada, entrada.length);
-        server.receive(sendInfo);//Espera uma resposta
+        DatagramPacket sendInfo = new DatagramPacket(saidaUDP, saidaUDP.length, endereco, porta);
+        serverUDP.send(sendInfo);//Envia o pacote ao servidor
+        sendInfo = new DatagramPacket(entradaUDP, entradaUDP.length);
+        serverUDP.receive(sendInfo);//Espera uma resposta
                 System.out.println(new String(sendInfo.getData(),0,sendInfo.getLength()));
         return new String(sendInfo.getData(),0,sendInfo.getLength()); // retorna informação pra View
     }
@@ -71,23 +77,31 @@ public class ConectionSensor{
     //Metodo que solicita um paciente a partir de um nick
     public String getPaciente (String nick) throws IOException{
         //Concatena as informações necessárias para coletar o paciente pelo nick
-        saida = ("SENSOR#GET_PACIENTE#"+nick).getBytes();
+        saidaUDP = ("SENSOR#GET_PACIENTE#"+nick).getBytes();
         //Cria um pacote para envio ao servidor
-        DatagramPacket sendInfo = new DatagramPacket(saida, saida.length, endereco, porta);
-        server.send(sendInfo);//Envia o pacote ao servidor
-        sendInfo = new DatagramPacket(entrada, entrada.length);
-        server.receive(sendInfo);//Espera uma resposta
+        DatagramPacket sendInfo = new DatagramPacket(saidaUDP, saidaUDP.length, endereco, porta);
+        serverUDP.send(sendInfo);//Envia o pacote ao servidor
+        sendInfo = new DatagramPacket(entradaUDP, entradaUDP.length);
+        serverUDP.receive(sendInfo);//Espera uma resposta
         
         return new String(sendInfo.getData(),0,sendInfo.getLength()); // retorna informação pra View
+    }
+    
+    public String autentica(String nick, String senha, String coordenadaX, String coordenadaY) throws IOException, ClassNotFoundException{
+        serverTCP = new Socket(endereco, porta);
+        saidaTCP = new ObjectOutputStream(serverTCP.getOutputStream());
+        saidaTCP.writeObject("SENSOR#AUTENTICA#"+nick+"#"+senha+"#"+coordenadaX+"#"+coordenadaY);
+        entradaTCP = new ObjectInputStream(serverTCP.getInputStream());
+        return (String)entradaTCP.readObject();
     }
     //----------------------------------------------------------
     //Metodo responsavel por fazer conexão com servidor
     public void conectar() throws IOException{
-        server = new DatagramSocket();
+        serverUDP = new DatagramSocket();
     }
     
     //Metodo responsavel por fechar conexão com o servidor
     public void desconectar() throws IOException{
-        server.close();
+        serverUDP.close();
     }
 }

@@ -173,7 +173,7 @@ public class AddSensor extends java.awt.Dialog {
         String nick = txtNick.getText(), nome = txtNome.getText(), senha = new String(txtSenha.getPassword());
         
         try {
-            conection();//Conecta-se ao servidor
+            conect.conectar();//Conecta-se ao servidor
             String resp = conect.salvarSensor(nick, nome, senha);//Solicita o salvamento passando os dados da tela
             System.out.println(resp);
             if(resp.equals("$FALHA$"))//Se a resposta for FALHA, mostra um Jpanel
@@ -243,25 +243,6 @@ public class AddSensor extends java.awt.Dialog {
     //Metodo que faz a conexão com o servidor
     private void conection() throws IOException{
         conect = new ConectionSensor(endereco, porta);//Cria-se uma instancia para a classe de conexão
-        conect.conectar();//Usa o metodo de conexão
-    }
-    
-    //Metodo usado para alterar o valor do label na tela dependendo do valor do jSlider
-    private String labelMovimento(){
-        switch (slMove.getValue()){
-            case 0:
-                return "Repouso";
-            case 1:
-                return "Moderado";
-            case 2:
-                return "Esporte";
-            default:
-                return null;
-        }
-    }
-    
-    //Metodo usado para setar valores no label de pressão dependendo dos valores do label
-    private String labelPressao(){
-        return slSistole.getValue()+"/"+slDiastole.getValue();
+        //conect.conectar();//Usa o metodo de conexão
     }
 }

@@ -34,7 +34,7 @@ public class Inicio extends javax.swing.JFrame {
     private void initComponents() {
 
         btnAddSensor = new javax.swing.JButton();
-        btnAtualizar = new javax.swing.JButton();
+        btnLogin = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
@@ -52,10 +52,10 @@ public class Inicio extends javax.swing.JFrame {
             }
         });
 
-        btnAtualizar.setText("Atualizar sensor");
-        btnAtualizar.addActionListener(new java.awt.event.ActionListener() {
+        btnLogin.setText("Login");
+        btnLogin.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnAtualizarActionPerformed(evt);
+                btnLoginActionPerformed(evt);
             }
         });
 
@@ -114,7 +114,7 @@ public class Inicio extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btnAddSensor, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnAtualizar, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(btnLogin, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addGap(0, 0, Short.MAX_VALUE)))
@@ -130,7 +130,7 @@ public class Inicio extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnAddSensor, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnAtualizar, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnLogin, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
@@ -148,16 +148,14 @@ public class Inicio extends javax.swing.JFrame {
     }//GEN-LAST:event_btnAddSensorActionPerformed
 
     //Action do botão de Atualizar Sensor
-    private void btnAtualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAtualizarActionPerformed
+    private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
         try{
-            UpdateSensor update = new UpdateSensor(this, false, txtEndereco.getText(),txtPorta.getText());//Chama uma nova instancia para a tela de atualização
-            update.setVisible(true);//Torna-a visivel
+            LoginSensor log = new LoginSensor(this, false, txtEndereco.getText(),txtPorta.getText());//Chama uma nova instancia para a tela de atualização
+            log.setVisible(true);//Torna-a visivel
         }catch(IOException e){
             JOptionPane.showMessageDialog(null, e.getMessage());
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Inicio.class.getName()).log(Level.SEVERE, null, ex);
         }        
-    }//GEN-LAST:event_btnAtualizarActionPerformed
+    }//GEN-LAST:event_btnLoginActionPerformed
 
     /**
      * @param args the command line arguments
@@ -196,7 +194,7 @@ public class Inicio extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAddSensor;
-    private javax.swing.JButton btnAtualizar;
+    private javax.swing.JButton btnLogin;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
