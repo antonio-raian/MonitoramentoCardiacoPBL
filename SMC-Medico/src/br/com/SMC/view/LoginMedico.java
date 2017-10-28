@@ -62,7 +62,7 @@ public class LoginMedico extends javax.swing.JDialog {
         setLocation(new java.awt.Point(100, 50));
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
-        jLabel1.setText("Login");
+        jLabel1.setText("Login Médico");
 
         jLabel2.setText("Login:");
 
