@@ -141,6 +141,7 @@ public class Inicio extends javax.swing.JDialog {
         jPanel2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
         txtPortaLocal.setColumns(10);
+        txtPortaLocal.setText("4321");
 
         jLabel4.setText("Porta:");
 
@@ -148,10 +149,12 @@ public class Inicio extends javax.swing.JDialog {
         jLabel6.setText("SERVIDOR DE BORDA");
 
         txtCoordX.setColumns(10);
+        txtCoordX.setText("2");
 
         jLabel7.setText("Coordenada X:");
 
         txtCoordY.setColumns(10);
+        txtCoordY.setText("3");
 
         jLabel8.setText("Coordenada Y:");
 
@@ -255,12 +258,17 @@ public class Inicio extends javax.swing.JDialog {
     //Metodo para ação do clique no botão Start
     private void btnStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStartActionPerformed
         this.ctrl = new Controller();//instancia de um novo controlador
+        String portaLocal = txtPortaLocal.getText(), cordeX = txtCoordX.getText(),cordeY = txtCoordY.getText();
         try {
-            String resp = conexao.novaBorda(InetAddress.getLocalHost().getHostAddress(), txtPortaLocal.getText(), txtCoordX.getText(), txtCoordY.getText());
+            if(!portaLocal.equals("") && !cordeX.equals("") && !cordeY.equals("")){
+                String resp = conexao.novaBorda(InetAddress.getLocalHost().getHostAddress(), portaLocal, cordeX, cordeY);
             JOptionPane.showMessageDialog(null, resp);
             //Abre conexão UDP
             this.serverUDP = new ServerUDP(Integer.parseInt(txtPortaLocal.getText()), ctrl);
-            lbConexao.setText("Conectado");//muda informação da tela para Conectado
+            lbConexao.setText(InetAddress.getLocalHost().getHostAddress()+":"+txtPortaLocal.getText());//muda informação da tela para IP e porta de conexão
+            }else{
+                JOptionPane.showMessageDialog(null, "Favor preencher todos os campos!");
+            }
         } catch (IOException ex) {
             //Mostra mensagem de falha na inicialização de um dos servidores
             JOptionPane.showMessageDialog(null, "Não foi possível iniciar o servidor");
