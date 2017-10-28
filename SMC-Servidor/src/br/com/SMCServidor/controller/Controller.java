@@ -4,9 +4,7 @@ import br.com.SMCServidor.model.Borda;
 import br.com.SMCServidor.model.Medico;
 import br.com.SMCServidor.model.Paciente;
 import java.io.IOException;
-import java.util.Comparator;
 import java.util.LinkedList;
-import java.util.PriorityQueue;
 
 /**
  *
@@ -14,52 +12,32 @@ import java.util.PriorityQueue;
  */
 //Controlador do sistema, onde é armazenada as informações dos pacientes e dos médicos
 public class Controller {
-    private PriorityQueue<Paciente> pacientes; //Lista q armazena todos os pacientes com sensores
+    private LinkedList<Paciente> pacientes; //Lista q armazena todos os pacientes com sensores
     private LinkedList<Medico> medicos; //Lista que armazena os médicos
     private LinkedList<Borda> bordas; //Lista que armazena os servidores de bordas
     
     //Construtor
     public Controller(){
         //Instancia de uma nova lista de prioridade e a criação de um comparador para a mesma
-        pacientes = new PriorityQueue<>(new Comparator<Paciente>() {
-            //método que ordena a lista, colocando os pacientes prioritários no inicio
-            @Override
-            public int compare(Paciente o1, Paciente o2) {
-                if(o1.isPrioridade()){
-                    if(o2.isPrioridade()){
-                        return 0;
-                    }else{
-                        return -1;
-                    }
-                }else if(o2.isPrioridade()){
-                    return 1;
-                }else{
-                    return 0;
-                }
-            }
-        }); //Inicia a lista de pacientes
+        pacientes = new LinkedList<>();//Inicia a lista de pacientes
         medicos = new LinkedList<>();//Instancia de uma nova lista de medicos
         bordas = new LinkedList<>();//Instancia de uma nova lista de servidores de borda
     }
     
     //Metodos dos sensores---------------------------
     //Método que cria e armazena um novo Paciente
-    public String salvarSensor(String nick, String nome, String senha, String movimento, String ritmo,
-            String sistole, String diastole, String cordenadaX, String cordenadaY) throws IOException{
+    public String salvarSensor(String nick, String nome, String senha) throws IOException{
         Paciente p;
-        String borda = null;
         if(!existPaciente(nick)){//Verifica se o nick já existe no sistema
-            p = new Paciente(nick, nome, senha, Integer.parseInt(movimento), Integer.parseInt(ritmo), Integer.parseInt(sistole), Integer.parseInt(diastole));
-            p.setPrioridade(prioridade(p));//Verifica se é prioritário ou não
-            borda = alocarPaciente(Double.parseDouble(cordenadaX), Double.parseDouble(cordenadaY));
-            p.setBorda(borda);
+            p = new Paciente(nick, nome, senha, 0, 0, 0, 0);
             pacientes.add(p);
+            return "CADASTRADO";
         }
-        return borda;//retorna a borda
+        return null;//retorna a borda
     }
     
     //Metodo pra atualizar as informações do Paciente
-    public boolean atualizarDadosSensor(String nick, String movimento, String ritmo, String sistole, String diastole) throws IOException {
+    public boolean atualizarDadosPaciente(String nick, String movimento, String ritmo, String sistole, String diastole) throws IOException {
         for(Paciente p:pacientes){
             if(p.getNick().equals(nick)){//Verifica se já existe um paciente com mesmo nick
                 p.setMovimento(Integer.parseInt(movimento));

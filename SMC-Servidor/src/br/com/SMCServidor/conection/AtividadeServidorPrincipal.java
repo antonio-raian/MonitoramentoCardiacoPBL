@@ -76,7 +76,7 @@ public class AtividadeServidorPrincipal extends Thread{
                 case "SENSOR"://Caso a primeira informação passada seja SENSOR
                     switch(array[1]){//Verifica o segundo comando
                         case "SALVAR":
-                            salvarSensor(array[2], array[3],array[4], array[5], array[6], array[7], array[8], array[9], array[10]);
+                            salvarSensor(array[2], array[3],array[4]);
                             break;
                         case "AUTENTICA":
                             autenticaSensor(array[2], array[3], array[4], array[5]);
@@ -119,8 +119,8 @@ public class AtividadeServidorPrincipal extends Thread{
 
     //Ações para o servior UDP que faz conexão com os sensores
     //Metodo que se conecta com o Controlador para armazenar um novo paciente
-    private void salvarSensor(String nick, String nome, String senha, String movimento, String ritmo, String sistole, String diastole, String coordenadaX, String coordenadaY) throws IOException{
-        String p = ctrl.salvarSensor(nick, nome, senha, movimento, ritmo, sistole, diastole,coordenadaX, coordenadaY);
+    private void salvarSensor(String nick, String nome, String senha) throws IOException{
+        String p = ctrl.salvarSensor(nick, nome, senha);
         saida = new ObjectOutputStream(clienteTCP.getOutputStream());//Estabelece uma forma de conectar-se ao cliente
         if(p==null){//Caso o paciente retornado seja nulo, houve algum erro, a mensagem enviada ao cliente é Falha
             saida.writeObject("$FALHA$");
@@ -128,12 +128,12 @@ public class AtividadeServidorPrincipal extends Thread{
             saida.writeObject(p); //retorna o endereço da borda e a porta de conexão
         }
         saida.close();
-        System.out.println("Dados Salvos: "+nick+", "+nome+", "+movimento+", "+ritmo+", "+sistole+"/"+diastole);
+        System.out.println("Dados Salvos: "+nick+", "+nome+", "+senha);
     }
     //Metodo que se conecta com o Controlador para atualizar informações de um paciente
     private void atualizarSensor(String nick, String movimento, String ritmo, String sistole, String diastole) throws IOException {
         //Metodo de atualização retorna true ou false
-        boolean p = ctrl.atualizarDadosSensor(nick, movimento, ritmo, sistole, diastole);
+        boolean p = ctrl.atualizarDadosPaciente(nick, movimento, ritmo, sistole, diastole);
         saida = new ObjectOutputStream(clienteTCP.getOutputStream());//Estabelece uma forma de conectar-se ao cliente
         if(!p){//Caso o paciente retornado seja falso, houve algum erro, a mensagem enviada ao cliente é Falha
             saida.writeObject("$FALHA$");
