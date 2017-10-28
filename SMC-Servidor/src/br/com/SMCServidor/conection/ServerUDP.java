@@ -36,7 +36,7 @@ public class ServerUDP implements Runnable{
                 DatagramPacket p = new DatagramPacket(recebe, recebe.length);//Cria um pacote pra armazenar informações advindas do cliente
                 System.out.println("Esperando conexão UDP");
                 servidor.receive(p);//Espera a conexão
-                new AtividadeServidor(servidor, p, ctrl).start();//Cria uma thread do tipo AtividadeServidor que irá tratar as informações recebidas do cliente
+                new AtividadeServidorPrincipal(servidor, p, ctrl).start();//Cria uma thread do tipo AtividadeServidor que irá tratar as informações recebidas do cliente
                 System.out.println("Cliente UDP conectado!");
             } catch (IOException ex) {
                 System.out.println("Pacote não recebido!");

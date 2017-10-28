@@ -32,7 +32,7 @@ public class ServerTCP implements Runnable{
             while(!servidor.isClosed()){//Laço de repetição para a criação de várias threads a medida que receber novas conexões
                 // aceitando a conexão com o cliente e inicializando uma thread
                 //Ao receber uma conexão, cria-se uma thread do tipo AtividadeServidor que irá tratar as informações recebidas
-                new AtividadeServidor(servidor.accept(),ctrl).start();
+                new AtividadeServidorPrincipal(servidor.accept(),ctrl).start();
                 System.out.println("Mais um cliente TCP atendido!");
             }
         }catch(Exception e){
