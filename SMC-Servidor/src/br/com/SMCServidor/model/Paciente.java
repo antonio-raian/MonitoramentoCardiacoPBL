@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package br.com.SMCServidorBorda.model;
+package br.com.SMCServidor.model;
 
 import java.io.Serializable;
 
@@ -13,15 +13,17 @@ import java.io.Serializable;
  */
 //Classe modelo para criação de novos pacientes do sistema
 public class Paciente implements Serializable{
-    private String nick, nome;//Atributos para identificação
+    private String nick, nome, senha;//Atributos para identificação
     private int ritmo, movimento, pressaoSis, pressaoDi;//Dados sobre o monitoramento cardíaco
     private boolean prioridade;//Variavel que define se ele é ou não prioridade
     private String borda;
 
     //Construtor
-    public Paciente(String nick,String nome, int movimento, int ritmo, int sistole, int diastole) {
+    public Paciente(String nick,String nome, String senha, int movimento, int ritmo, int sistole, int diastole) {
+        //this.id = contador++;
         this.nick = nick;
         this.nome = nome;
+        this.senha = senha;
         this.movimento = movimento;
         this.ritmo = ritmo;
         this.pressaoSis = sistole;
@@ -91,6 +93,14 @@ public class Paciente implements Serializable{
 
     public void setBorda(String borda) {
         this.borda = borda;
+    }
+
+    public String getSenha() {
+        return senha;
+    }
+
+    public void setSenha(String senha) {
+        this.senha = senha;
     }
     
     /*Metodo toString que retorna todas as informações do 
