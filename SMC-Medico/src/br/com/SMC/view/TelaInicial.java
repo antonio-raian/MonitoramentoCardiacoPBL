@@ -185,7 +185,9 @@ public class TelaInicial extends javax.swing.JDialog {
     //action do botão de detalhamento de paciente
     private void btnDetalhesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDetalhesActionPerformed
         try {
+            
             String[] s = conect.getBordaPaciente(txtNick.getText()).split("#");
+            System.out.println("Borda:"+s);
             if(s.length>=2){
                 DetalhePaciente dtPaciente = new DetalhePaciente(parent, true, s[0], Integer.parseInt(s[1]), txtNick.getText());
                 dtPaciente.setVisible(true);//torna-a visivel

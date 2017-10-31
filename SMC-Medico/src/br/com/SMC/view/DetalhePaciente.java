@@ -234,7 +234,6 @@ public class DetalhePaciente extends javax.swing.JDialog {
     //metodo que inicia a variavel de conexão
     private void conecta() throws IOException {
         conect = new ConectionMedico(endereco, porta);//Cria-se uma instancia para a classe de conexão
-        conect.conectarTCP();//Usa o metodo de conexão
     }
     
     //Metodo que inicia os valores da tela
@@ -257,7 +256,6 @@ public class DetalhePaciente extends javax.swing.JDialog {
         
     //Metodo usado para coletar as informações do servidor e setar nos labels
     private void carregaDados() throws IOException, ClassNotFoundException{
-        conecta();//Conecta ao servidor
         String str = conect.getPaciente(nick);//solicita as informações do paciente pelo nick
         if(str.equals("$FALHA$")){//Se a resposta for NAO_ENCONTRADO
             JOptionPane.showMessageDialog(null, "Paciente "+nick+" não encontrado");//Mosta o erro na tela
