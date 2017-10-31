@@ -185,9 +185,15 @@ public class TelaInicial extends javax.swing.JDialog {
     //action do botão de detalhamento de paciente
     private void btnDetalhesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDetalhesActionPerformed
         try {
-            //Cria-se uma instancia para tela de detalhes passando o nick
-            DetalhePaciente dtPaciente = new DetalhePaciente(parent, true, endereco, porta, txtNick.getText());
-            dtPaciente.setVisible(true);//torna-a visivel
+            String[] s = conect.getBordaPaciente(txtNick.getText()).split("#");
+            if(s.length>=2){
+                DetalhePaciente dtPaciente = new DetalhePaciente(parent, true, s[0], Integer.parseInt(s[1]), txtNick.getText());
+                dtPaciente.setVisible(true);//torna-a visivel
+            }else{
+                //Cria-se uma instancia para tela de detalhes passando o nick
+                DetalhePaciente dtPaciente = new DetalhePaciente(parent, true, endereco, porta, txtNick.getText());
+                dtPaciente.setVisible(true);//torna-a visivel
+            }
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(null, "Não conseguiu conectar ao servidor!");
         } catch (ClassNotFoundException ex) {
@@ -276,19 +282,16 @@ public class TelaInicial extends javax.swing.JDialog {
     // End of variables declaration//GEN-END:variables
     private ConectionMedico conect;//responsável pela conexão
     private DefaultTableModel pacientes;//Responsável pela lista usada no jTable
-    private int delay = 0;   // delay de 0 seg.
-    private int intervalo = 5000;  // intervalo de 5 seg.
     Timer timer = new Timer();//Usado para envio de dados automaticamente
     
     //metodo que inicia a variavel de conexão
     private void conecta() throws IOException {
         conect = new ConectionMedico(endereco, porta);//Cria-se uma instancia para a classe de conexão
-        conect.conectar();//Usa o metodo de conexão
     }
     
     //Metodo que inicia os valores da tela
     private void init() throws IOException, ClassNotFoundException {
-        //carregaDados();
+        conecta();        
         timer.scheduleAtFixedRate(new TimerTask() {
             public void run() {
                 try {
@@ -299,17 +302,16 @@ public class TelaInicial extends javax.swing.JDialog {
                     JOptionPane.showMessageDialog(null, "Erro de comunicação");
                 }
             }
-        }, delay, intervalo);
+        }, 0, 5000);
     }
     
     //Metodo usado para recuperar os dados dos pacientes em risco e coloca-los na tela
     private void carregaDados() throws IOException, ClassNotFoundException{
-        conecta();//conecta-se ao servior
         String str = conect.listaPrioritarios();//solicita a lista de prioritarios e quanda numa String
         pacientes = new DefaultTableModel();
         pacientes.addColumn("Nome");
         pacientes.addColumn("Nick");
-        if(!str.equals("$VAZIO$")){//Se não estiver vazia a resposta do servidor
+        if(!str.equals("")){//Se não estiver vazia a resposta do servidor
             String[] aux = str.split("#");//Separa as informações pelo "#'
             for(String s:aux){//Percorre todas as informações do servidor
                 String[] x = s.split("-");

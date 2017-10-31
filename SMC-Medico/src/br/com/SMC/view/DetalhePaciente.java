@@ -229,14 +229,12 @@ public class DetalhePaciente extends javax.swing.JDialog {
     // End of variables declaration//GEN-END:variables
     private ConectionMedico conect;//responsável pela conexão
     private DefaultListModel<String> hist;//Responsável pela lista usada no jList
-    private int delay = 0;   // delay de 0 seg.
-    private int intervalo = 5000;  // intervalo de 5 seg.
     Timer timer = new Timer();//Usado para envio de dados automaticamente
     
     //metodo que inicia a variavel de conexão
     private void conecta() throws IOException {
         conect = new ConectionMedico(endereco, porta);//Cria-se uma instancia para a classe de conexão
-        conect.conectar();//Usa o metodo de conexão
+        conect.conectarTCP();//Usa o metodo de conexão
     }
     
     //Metodo que inicia os valores da tela
@@ -254,14 +252,14 @@ public class DetalhePaciente extends javax.swing.JDialog {
                     JOptionPane.showMessageDialog(null, "Erro de comunicação");
                 }
             }
-        }, delay, intervalo);
+        }, 0, 5000);
     }
         
     //Metodo usado para coletar as informações do servidor e setar nos labels
     private void carregaDados() throws IOException, ClassNotFoundException{
         conecta();//Conecta ao servidor
         String str = conect.getPaciente(nick);//solicita as informações do paciente pelo nick
-        if(str.equals("$NAO_ENCONTRADO$")){//Se a resposta for NAO_ENCONTRADO
+        if(str.equals("$FALHA$")){//Se a resposta for NAO_ENCONTRADO
             JOptionPane.showMessageDialog(null, "Paciente "+nick+" não encontrado");//Mosta o erro na tela
         }else{
             String[] aux = str.split("#");//Separa as informações do pacientes vindas do servidor

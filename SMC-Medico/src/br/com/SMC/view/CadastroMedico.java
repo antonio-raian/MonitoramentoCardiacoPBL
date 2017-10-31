@@ -161,7 +161,6 @@ public class CadastroMedico extends javax.swing.JDialog {
     //action do botão de salvar
     private void btnSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarActionPerformed
         try {
-            conect.conectar();//conecta-se ao servidor
             //Solicita o armazenamento dos dados do medico
             switch (conect.salvarMedico(txtNome.getText(), txtLogin.getText(), new String(txtSenha.getPassword()))){
                 case "$EXISTENTE$"://Se a resposta for EXISTENTE, solicita-se um novo login
@@ -175,8 +174,6 @@ public class CadastroMedico extends javax.swing.JDialog {
             dispose();
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(null, "Erro na conexão!");
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(CadastroMedico.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_btnSalvarActionPerformed
 
@@ -247,6 +244,6 @@ public class CadastroMedico extends javax.swing.JDialog {
     //metodo que inicia a variavel de conexão
     private void init() throws IOException {
         conect = new ConectionMedico(endereco, porta);
-        //conect.conectar();
+        //conect.conectarTCP();
     }
 }
