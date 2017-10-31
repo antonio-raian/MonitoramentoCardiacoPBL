@@ -5,12 +5,18 @@
  */
 package br.com.SMCServidorBorda.controller;
 
+import br.com.SMCServidorBorda.conection.Conection;
 import br.com.SMCServidorBorda.model.Medico;
 import br.com.SMCServidorBorda.model.Paciente;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
+import java.util.Stack;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -20,9 +26,12 @@ import java.util.PriorityQueue;
 public class Controller {
     private PriorityQueue<Paciente> pacientes; //Lista q armazena todos os pacientes com sensores
     private LinkedList<Medico> medicos; //Lista que armazena os médicos
+    private Stack<String> risco;
+    Timer timer = new Timer();//Thread responsável por atualizar altomaticamente
+    private Conection conexao;
     
     //Construtor
-    public Controller(){
+    public Controller(String host, String porta){
         //Instancia de uma nova lista de prioridade e a criação de um comparador para a mesma
         pacientes = new PriorityQueue<>(new Comparator<Paciente>() {
             //método que ordena a lista, colocando os pacientes prioritários no inicio
@@ -42,6 +51,8 @@ public class Controller {
             }
         }); //Inicia a lista de pacientes
         medicos = new LinkedList<>();//Instancia de uma nova lista de medicos
+        risco = new Stack<>();
+        enviaInfo(host, porta);
     }
     
     //Metodos dos sensores---------------------------
@@ -60,16 +71,32 @@ public class Controller {
     public boolean atualizarSensor(String nick, String nome, String movimento, String ritmo, String sistole, String diastole) throws IOException {
         //Cria um novo paciente com as informações passadas
         Paciente p = new Paciente(nick, nome, Integer.parseInt(movimento), Integer.parseInt(ritmo), Integer.parseInt(sistole), Integer.parseInt(diastole));
+        if(prioridade(p)){
+            risco.push(p.getNick()+" - "+p.getNome());
+            p.setPrioridade(true);
+        }else{
+            p.setPrioridade(false);
+        }        
         if(pacientes.contains(p)){//Verifica se já existe um paciente com mesmo nick
-            pacientes.remove(p);//Remove as informações anteriores do paciente
-            p.setPrioridade(prioridade(p));
+            pacientes.remove(p);//Remove as informações anteriores do paciente            
             pacientes.add(p);//E adiciona as novas
             return true;
-        } 
-        return false;
+        }else{
+            pacientes.add(p);
+            return true;
+        }
+    }
+    
+    public String getPacientesRisco(){
+        String s="";
+        while(!risco.isEmpty()){
+            s+=risco.pop()+"#";
+        }
+        return s;
     }
     //----------------------------------
-     //Metodos dos medicos----------------------------
+    
+    //Metodos dos medicos----------------------------
     //Metodo que armazena o médico no sistema
     public Medico salvarMedico(String nome, String login, String senha){
         Medico m = null;
@@ -101,7 +128,8 @@ public class Controller {
         }
         return s;
     }
-     //-----------------------------------------------
+     
+    //-----------------------------------------------
     //Metodo que retorna todos os pacientes cadastrados
     public String listarSensores(){
         String str = "";
@@ -166,5 +194,37 @@ public class Controller {
                 return true;
         }
         return false;
+    }
+    
+    //Metodo que retorna todos os conectados na borda
+    public String[] getAll(){
+        String[] todos = new String[pacientes.size()+medicos.size()];
+        int i = 0;
+        for(Paciente p:pacientes){
+            todos[i] = p.getNome();
+            i++;
+        }
+        for(Medico m:medicos){
+            todos[i] = m.getNome();
+            i++;
+        }
+        return todos;
+    }
+    
+    //THREAD QUE ATUALIZA AS INFORMAÇÕES DOS USUÁRIOS EM RISCO DA NUVEM
+    private void enviaInfo(String host, String porta){
+        timer.scheduleAtFixedRate(new TimerTask() {
+            public void run() {
+                conexao = new Conection(host, porta);
+                try {
+                    conexao.enviaPacientes(getPacientesRisco());
+                } catch (IOException ex) {
+                    Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (ClassNotFoundException ex) {
+                    Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+            }
+        }, 30000, 20000);
     }
 }

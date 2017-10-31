@@ -13,6 +13,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 
 /**
@@ -51,7 +52,7 @@ public class Inicio extends javax.swing.JDialog {
         btnStart = new javax.swing.JButton();
         btnStop = new javax.swing.JButton();
         lbConexao = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
+        btnConect = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         txtPortaLocal = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
@@ -60,6 +61,8 @@ public class Inicio extends javax.swing.JDialog {
         jLabel7 = new javax.swing.JLabel();
         txtCoordY = new javax.swing.JTextField();
         jLabel8 = new javax.swing.JLabel();
+        jScrollList = new javax.swing.JScrollPane();
+        listConect = new javax.swing.JList<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Servidor de Borda");
@@ -136,7 +139,12 @@ public class Inicio extends javax.swing.JDialog {
         lbConexao.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         lbConexao.setText("Desconectado");
 
-        jButton1.setText("Conectados");
+        btnConect.setText("Conectados");
+        btnConect.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnConectActionPerformed(evt);
+            }
+        });
 
         jPanel2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
@@ -204,6 +212,8 @@ public class Inicio extends javax.swing.JDialog {
                 .addContainerGap())
         );
 
+        jScrollList.setViewportView(listConect);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -221,7 +231,7 @@ public class Inicio extends javax.swing.JDialog {
                                 .addComponent(btnStop, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addGap(113, 113, 113)
-                                .addComponent(jButton1)
+                                .addComponent(btnConect)
                                 .addGap(110, 110, 110))))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
@@ -230,6 +240,10 @@ public class Inicio extends javax.swing.JDialog {
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
+            .addGroup(layout.createSequentialGroup()
+                .addGap(30, 30, 30)
+                .addComponent(jScrollList, javax.swing.GroupLayout.PREFERRED_SIZE, 272, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -248,7 +262,9 @@ public class Inicio extends javax.swing.JDialog {
                     .addComponent(btnStart, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnStop, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
-                .addComponent(jButton1)
+                .addComponent(btnConect)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollList, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -257,12 +273,13 @@ public class Inicio extends javax.swing.JDialog {
 
     //Metodo para ação do clique no botão Start
     private void btnStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStartActionPerformed
-        this.ctrl = new Controller();//instancia de um novo controlador
+        this.ctrl = new Controller(txtEndNuvem.getText(), txtPortaNuvem.getText());//instancia de um novo controlador
         String portaLocal = txtPortaLocal.getText(), cordeX = txtCoordX.getText(),cordeY = txtCoordY.getText();
         try {
             if(!portaLocal.equals("") && !cordeX.equals("") && !cordeY.equals("")){
                 String resp = conexao.novaBorda(InetAddress.getLocalHost().getHostAddress(), portaLocal, cordeX, cordeY);
             JOptionPane.showMessageDialog(null, resp);
+            btnConect.setVisible(true);
             //Abre conexão UDP
             this.serverUDP = new ServerUDP(Integer.parseInt(txtPortaLocal.getText()), ctrl);
             lbConexao.setText(InetAddress.getLocalHost().getHostAddress()+":"+txtPortaLocal.getText());//muda informação da tela para IP e porta de conexão
@@ -291,6 +308,18 @@ public class Inicio extends javax.swing.JDialog {
             Logger.getLogger(Inicio.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_btnStopActionPerformed
+
+    private void btnConectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConectActionPerformed
+        String str[] = ctrl.getAll();
+        System.out.println(str.length);
+        if(str.length!=0){
+            DefaultListModel listmodel = new DefaultListModel();
+            for(String s:str)
+                listmodel.addElement(s);
+            listConect.setModel(listmodel);
+            listConect.setVisible(true);
+        }
+    }//GEN-LAST:event_btnConectActionPerformed
 
     /**
      * @param args the command line arguments
@@ -340,9 +369,9 @@ public class Inicio extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnConect;
     private javax.swing.JButton btnStart;
     private javax.swing.JButton btnStop;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -353,7 +382,9 @@ public class Inicio extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JScrollPane jScrollList;
     private javax.swing.JLabel lbConexao;
+    private javax.swing.JList<String> listConect;
     private javax.swing.JTextField txtCoordX;
     private javax.swing.JTextField txtCoordY;
     private javax.swing.JTextField txtEndNuvem;
@@ -363,6 +394,8 @@ public class Inicio extends javax.swing.JDialog {
     private Conection conexao;
     
     private void conecta() throws UnknownHostException, IOException{
-        conexao = new Conection(txtEndNuvem.getText(), txtPortaNuvem.getText());
+        conexao = new Conection(txtEndNuvem.getText(), txtPortaNuvem.getText());        
+        listConect.setVisible(false);
+        btnConect.setVisible(false);
     }
 }

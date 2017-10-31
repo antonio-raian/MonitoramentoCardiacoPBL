@@ -32,7 +32,9 @@ public class Conection {
         saida = new ObjectOutputStream(server.getOutputStream());
         saida.writeObject("SERVER#NOVABORDA#"+host+"#"+porta+"#"+coordenadaX+"#"+coordenadaY);
         entrada = new ObjectInputStream(server.getInputStream());
-        return (String) entrada.readObject();
+        String s = (String) entrada.readObject();
+        desconectar();
+        return s;
     }
     
     public String removeBorda(String host) throws IOException, ClassNotFoundException{
@@ -40,7 +42,18 @@ public class Conection {
         saida = new ObjectOutputStream(server.getOutputStream());
         saida.writeObject("SERVER#REMOVEBORDA#"+host);
         entrada  = new ObjectInputStream(server.getInputStream());
-        return (String) entrada.readObject();
+        String s = (String) entrada.readObject();
+        desconectar();
+        return s;
+    }
+    
+    public String enviaPacientes(String info) throws IOException, ClassNotFoundException{
+        conectar();
+        saida = new ObjectOutputStream(server.getOutputStream());
+        saida.writeObject("SERVER#SEND#"+info);
+        String s = (String) entrada.readObject();
+        desconectar();
+        return s;
     }
     
     //----------------------------------------------------------
@@ -54,5 +67,5 @@ public class Conection {
         saida.close();
         entrada.close();
         server.close();
-    }
+    }    
 }

@@ -16,7 +16,6 @@ public class Paciente implements Serializable{
     private String nick, nome;//Atributos para identificação
     private int ritmo, movimento, pressaoSis, pressaoDi;//Dados sobre o monitoramento cardíaco
     private boolean prioridade;//Variavel que define se ele é ou não prioridade
-    private String borda;
 
     //Construtor
     public Paciente(String nick,String nome, int movimento, int ritmo, int sistole, int diastole) {
@@ -83,14 +82,6 @@ public class Paciente implements Serializable{
 
     public void setPrioridade(boolean prioridade) {
         this.prioridade = prioridade;
-    }
-    
-    public String getBorda() {
-        return borda;
-    }
-
-    public void setBorda(String borda) {
-        this.borda = borda;
     }
     
     /*Metodo toString que retorna todas as informações do 
