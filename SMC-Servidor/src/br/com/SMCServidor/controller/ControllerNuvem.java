@@ -14,7 +14,6 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.LinkedList;
 import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  *
@@ -87,7 +86,8 @@ public class ControllerNuvem {
     
     public String alocarPaciente(double x, double y){
         String menorDistancia = null;
-        double menor = 9999;
+        double menor = Math.sqrt(Math.pow(bordas.get(0).getCordenadaX()-x,2)+Math.pow(bordas.get(0).getCordenadaY()-y,2));;
+        menorDistancia = bordas.get(0).getEndereco()+"#"+bordas.get(0).getPorta();
         double valor;
         if(!bordas.isEmpty()){
             for(Borda b:bordas){
