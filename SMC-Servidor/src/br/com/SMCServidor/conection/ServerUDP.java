@@ -5,7 +5,7 @@
  */
 package br.com.SMCServidor.conection;
 
-import br.com.SMCServidor.controller.Controller;
+import br.com.SMCServidor.controller.ControllerNuvem;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -19,10 +19,10 @@ import java.net.SocketException;
 public class ServerUDP implements Runnable{
     private final DatagramSocket servidor; //atributo responsável por estabelecer a conexão UDP
     private byte[] recebe = new byte[2048];//Array para receber a informação da conexão
-    private final Controller ctrl; //Atributo que recebe o controlador
+    private final ControllerNuvem ctrl; //Atributo que recebe o controlador
 
     //Construtor 
-    public ServerUDP(int porta, Controller ctrl) throws SocketException {
+    public ServerUDP(int porta, ControllerNuvem ctrl) throws SocketException {
         servidor = new DatagramSocket(porta);//Abre uma coneão UDP para uma determinada porta
         this.ctrl = ctrl;
         System.out.println("UDP: Ouvindo a porta "+porta);

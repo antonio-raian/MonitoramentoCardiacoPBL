@@ -5,8 +5,8 @@
  */
 package br.com.SMCServidor.conection;
 
-import br.com.SMCServidor.controller.Controller;
-import br.com.SMCServidor.model.Medico;
+import br.com.SMCServidor.controller.ControllerNuvem;
+import br.com.SMCServidor.model.MedicoNuvem;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -27,11 +27,12 @@ public class AtividadeServidorPrincipal extends Thread{
     private ObjectInputStream entrada;//Objetos que armazena informações advindas do cliente
     private ObjectOutputStream saida; // Objeto usado para enviar mensagens aos clientes TCP
     private DatagramPacket entradaUDP; //Objeto usado para enviar mensagens aos clientes UDP;
-    private final Controller ctrl;//Nosso objeto que contem as listas e informações salvas do sistema
+    private byte[] saidaUDP;
+    private final ControllerNuvem ctrl;//Nosso objeto que contem as listas e informações salvas do sistema
     private final String str; //String usada pra receber as requisições dos clientes
     
     //Construtor que permite conexão TCP
-    public AtividadeServidorPrincipal(Socket socket, Controller ctrl) throws IOException, ClassNotFoundException {
+    public AtividadeServidorPrincipal(Socket socket, ControllerNuvem ctrl) throws IOException, ClassNotFoundException {
         clienteTCP = socket;//Recebe a conexão
         this.ctrl = ctrl;//Seta o objeto que contem as informações do Sistema
         
@@ -41,7 +42,7 @@ public class AtividadeServidorPrincipal extends Thread{
         System.out.println("Recebido: "+str);
     }
     //Construtor que permite conexão UDP
-    public AtividadeServidorPrincipal(DatagramSocket socket, DatagramPacket packet, Controller ctrl) throws IOException{
+    public AtividadeServidorPrincipal(DatagramSocket socket, DatagramPacket packet, ControllerNuvem ctrl) throws IOException{
         this.ctrl = ctrl;//Seta o objeto que contem as informações do Sistema
         this.entradaUDP = packet; //Recebe o pacote enviado ao servidor
         clienteUDP = socket;//Recebe o meio de comunicação com o cliente
@@ -82,13 +83,10 @@ public class AtividadeServidorPrincipal extends Thread{
                             autenticaSensor(array[2], array[3], array[4], array[5]);
                             break;
                         case "ATUALIZAR":
-                            atualizarSensor(array[2], array[3],array[4], array[5], array[6]);
-                            break;
-                        case "LISTAR":
-                            listarSensores();
+                            atualizarSensor(array[2], array[3],array[4], array[5], array[6], array[7]);
                             break;
                         case "GET_PACIENTE":
-                            getPacienteUDP(array[2]);
+                            getPaciente(array[2]);
                             break;
                     }
                     break;
@@ -103,8 +101,11 @@ public class AtividadeServidorPrincipal extends Thread{
                         case "LISTAR_PRIORITARIOS":
                             listarPrioritarios();
                             break;
+                        case "GET_BORDA":
+                            getBorda(array[2]);
+                            break;
                         case "GET_PACIENTE":
-                            getPacienteTCP(array[2]);
+                            getPaciente(array[2]);
                             break;
                         default:
                             break;
@@ -120,71 +121,67 @@ public class AtividadeServidorPrincipal extends Thread{
     //Ações para o servior UDP que faz conexão com os sensores
     //Metodo que se conecta com o Controlador para armazenar um novo paciente
     private void salvarSensor(String nick, String nome, String senha) throws IOException{
-        String p = ctrl.salvarSensor(nick, nome, senha);
-        saida = new ObjectOutputStream(clienteTCP.getOutputStream());//Estabelece uma forma de conectar-se ao cliente
-        if(p==null){//Caso o paciente retornado seja nulo, houve algum erro, a mensagem enviada ao cliente é Falha
-            saida.writeObject("$FALHA$");
-        }else{//Se for diferente de nulo, ele foi cadastrado
-            saida.writeObject(p); //retorna o endereço da borda e a porta de conexão
-        }
-        saida.close();
+        String s = ctrl.salvarSensor(nick, nome, senha);
+        //Cria um pacote e concatena a String de retorno
+        DatagramPacket sendResult = new DatagramPacket(s.getBytes(), s.getBytes().length, entradaUDP.getAddress(),entradaUDP.getPort());
+        clienteUDP.send(sendResult);//Envia o pacote criado para o cliente
+        
         System.out.println("Dados Salvos: "+nick+", "+nome+", "+senha);
     }
     //Metodo que se conecta com o Controlador para atualizar informações de um paciente
-    private void atualizarSensor(String nick, String movimento, String ritmo, String sistole, String diastole) throws IOException {
+    private void atualizarSensor(String nick, String nome, String movimento, String ritmo, String sistole, String diastole) throws IOException {
         //Metodo de atualização retorna true ou false
         boolean p = ctrl.atualizarDadosPaciente(nick, movimento, ritmo, sistole, diastole);
-        saida = new ObjectOutputStream(clienteTCP.getOutputStream());//Estabelece uma forma de conectar-se ao cliente
-        if(!p){//Caso o paciente retornado seja falso, houve algum erro, a mensagem enviada ao cliente é Falha
-            saida.writeObject("$FALHA$");
-        }else{//Se for diferente de nulo, ele foi cadastrado
-            saida.writeObject("$ATUALIZADO$"); //retorna o endereço da borda e a porta de conexão
+        String s;
+        if(!p){//Se o retorno for false, não foi possível atualizar os dados do paciente
+            s = "$FALHA$";//A mensagem enviada é FALHA
+        }else{//Se for true, a atualização foi bem sucedida
+            s = "$ATUALIZADO$";//A mensagem enviada é ATUALIZADO
         }
-        saida.close();
+        //Cria um pacote e concatena a String de retorno
+        DatagramPacket sendResult = new DatagramPacket(s.getBytes(), s.getBytes().length, entradaUDP.getAddress(),entradaUDP.getPort());
+        clienteUDP.send(sendResult);;//Envia o pacote criado para o cliente
+        
         System.out.println("Dados Atualizados para: "+nick+", "+movimento+", "+ritmo+", "+sistole+"/"+diastole);
     }
     
-    //Metodo que solicita a lista de pacientes ao controlador
-    private void listarSensores() throws IOException {
-        String s = ctrl.listarSensores();//Concatena todos os pacientes numa string separado por "#"
+    private void autenticaSensor(String nick, String senha, String x, String y) throws IOException {
         saida = new ObjectOutputStream(clienteTCP.getOutputStream());//Estabelece uma forma de conectar-se ao cliente
-        if(s==""){//Caso o paciente retornado seja nulo, houve algum erro, a mensagem enviada ao cliente é Falha
-            saida.writeObject("$FALHA$");
-        }else{//Se for diferente de nulo, ele foi cadastrado
-            saida.writeObject(s); //retorna o endereço da borda e a porta de conexão
-        }
-        saida.close();
+        saida.writeObject(ctrl.autenticaSensor(nick, senha, x, y));//envia uma string com o nick e o nome dos pacientes em risco separados por "#"
+        
+        saida.close();//Encerra a conexão com o cliente
+        
     }
     
     //Metodo que solicita um paciente pelo nick
-    private void getPacienteUDP(String nick) throws IOException{
+    private void getPaciente(String nick) throws IOException{
         String s = ctrl.getPaciente(nick);//O metodo retorna uma string com todas as informações do paciente separada por #
-        saida = new ObjectOutputStream(clienteTCP.getOutputStream());//Estabelece uma forma de conectar-se ao cliente
-        if(s==""){//Caso o paciente retornado seja nulo, houve algum erro, a mensagem enviada ao cliente é Falha
-            saida.writeObject("$FALHA$");
-        }else{//Se for diferente de nulo, ele foi cadastrado
-            saida.writeObject(s); //retorna o endereço da borda e a porta de conexão
+        if(s==null){//Se essa String for nula, não encontrou o paciente
+            s = "$FALHA$";//E o retorno é FALHA
         }
-        saida.close();
+        //Cria um pacote e concatena a String de retorno
+        DatagramPacket sendResult = new DatagramPacket(s.getBytes(), s.getBytes().length, entradaUDP.getAddress(),entradaUDP.getPort());
+        clienteUDP.send(sendResult);;//Envia o pacote criado para o cliente
     }
 
-    //Ações para o Servidor TCP que faz conexão com o Medico
+    //Ações para o Servidor TCP que faz conexão com o MedicoNuvem
     //Metodo que pede pra salvar um novo médico
     private void salvarMedico(String nome, String login, String senha) throws IOException{
-        saida = new ObjectOutputStream(clienteTCP.getOutputStream());//Estabelece uma forma de conectar-se ao cliente
-        Medico m = ctrl.salvarMedico(nome, login, senha);//Solicita a criação de um novo médico no sistema
+        MedicoNuvem m = ctrl.salvarMedico(nome, login, senha);//Solicita a criação de um novo médico no sistema
         if(m == null){//Se o retorno for nulo
-            saida.writeObject("$EXISTENTE$");//Envia uma mensagem de EXISTENTE ao cliente
+            saidaUDP = ("$EXISTENTE$").getBytes();//Envia uma mensagem de EXISTENTE ao cliente
         }else{//Se for diferente de nulo
-            saida.writeObject("$CADASTRADO$");//Envia uma mensagem de CADASTRADO ao cliente
+            saidaUDP = ("$CADASTRADO$").getBytes();//Envia uma mensagem de CADASTRADO ao cliente
         }
-        saida.close();//Encerra a conexão com o cliente
+        //Cria um pacote e concatena a String de retorno
+        DatagramPacket sendResult = new DatagramPacket(saidaUDP, saidaUDP.length, entradaUDP.getAddress(),entradaUDP.getPort());
+        clienteUDP.send(sendResult);;//Envia o pacote criado para o cliente
     }
     
-    //Metodo que faz a autenticação do login do Medico
+    //Metodo que faz a autenticação do login do MedicoNuvem
     private void autenticaMedico(String login, String senha) throws IOException{
         saida = new ObjectOutputStream(clienteTCP.getOutputStream());//Estabelece uma forma de conectar-se ao cliente
-        Medico m = ctrl.autenticaMedico(login, senha);//Tenta fazer o login de um médico
+        MedicoNuvem m = ctrl.autenticaMedico(login, senha);//Tenta fazer o login de um médico
         if(m == null){//Se a resposta for nula
             saida.writeObject("$INEXISTENTE$");//Envia uma mensagem de INEXISTENTE ao cliente
         }else{//Se não for nula
@@ -193,30 +190,25 @@ public class AtividadeServidorPrincipal extends Thread{
         saida.close();//Encerra a conexão com o cliente
     }
     
-    //Metodo que solicita um paciente a partir de um nick
-    private void getPacienteTCP(String nick) throws IOException{
-        saida = new ObjectOutputStream(clienteTCP.getOutputStream());//Estabelece uma forma de conectar-se ao cliente
-        String s = ctrl.getPaciente(nick);//Solicita o paciente pelo nick
-        if(s==null){//Se a resposta for nula
-            saida.writeObject("$NAO_ENCONTRADO$");//Envia uma mensagem de NAO_ENCONTRADO ao cliente
-        }else{
-            saida.writeObject(s);//Envia uma string com as informações do paciente para o cliente
-        }
-        saida.close();//Encerra a conexão com o cliente
-    }
-    
     //Metodo que solicita os pacientes em risco
     private void listarPrioritarios() throws IOException{
-        saida = new ObjectOutputStream(clienteTCP.getOutputStream());//Estabelece uma forma de conectar-se ao cliente
         String s = ctrl.listarPrioritarios();//Pede a lista dos pacientes em risco
-        if("".equals(s)){//Se for uma string branco
-            saida.writeObject("$VAZIO$");//Envia uma mensagem de VAZIO ao cliente
-        }else{//Se não for nula
-            saida.writeObject(s);//envia uma string com o nick e o nome dos pacientes em risco separados por "#"
-        }
-        saida.close();//Encerra a conexão com o cliente
+        //Cria um pacote e concatena a String de retorno
+        DatagramPacket sendResult = new DatagramPacket(s.getBytes(), s.getBytes().length, entradaUDP.getAddress(),entradaUDP.getPort());
+        clienteUDP.send(sendResult);//Envia o pacote criado para o cliente
     }
 
+    private void getBorda(String nick) throws IOException {
+        String s = ctrl.getPacienteBorda(nick);//Pede a lista dos pacientes em risco
+        if(s==null){//Se essa String for nula, não encontrou o paciente
+            s = "$FALHA$";//E o retorno é FALHA
+        }
+        //Cria um pacote e concatena a String de retorno
+        DatagramPacket sendResult = new DatagramPacket(s.getBytes(), s.getBytes().length, entradaUDP.getAddress(),entradaUDP.getPort());
+        clienteUDP.send(sendResult);//Envia o pacote criado para o cliente
+    }
+    
+    //Módulo dos servidores de borda
     private void novaBorda(String endereco, String porta, String x, String y) throws IOException {
         saida = new ObjectOutputStream(clienteTCP.getOutputStream());//Estabelece uma forma de conectar-se ao cliente
         if(ctrl.novaBorda(endereco, porta, Double.parseDouble(x), Double.parseDouble(y))){
@@ -226,23 +218,19 @@ public class AtividadeServidorPrincipal extends Thread{
         }
         saida.close();//Encerra a conexão com o cliente
     }
-
-    private void pacientesRisco(String pacientes) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    private void autenticaSensor(String nick, String senha, String x, String y) throws IOException {
-        saida = new ObjectOutputStream(clienteTCP.getOutputStream());//Estabelece uma forma de conectar-se ao cliente
-        saida.writeObject(ctrl.autenticaSensor(nick, senha, x, y));//envia uma string com o nick e o nome dos pacientes em risco separados por "#"
-        
-        saida.close();//Encerra a conexão com o cliente
-        
-    }
-
+    
     private void removeBorda(String host) throws IOException {
         ctrl.removeBorda(host);
         saida = new ObjectOutputStream(clienteTCP.getOutputStream());//Estabelece uma forma de conectar-se ao cliente
         saida.writeObject("Borda Removida!");//envia uma string com o nick e o nome dos pacientes em risco separados por "#"
+        
+        saida.close();//Encerra a conexão com o cliente
+    }
+    
+    private void pacientesRisco(String pacientes) throws IOException {
+        ctrl.setPacientesRisco(pacientes);
+        saida = new ObjectOutputStream(clienteTCP.getOutputStream());//Estabelece uma forma de conectar-se ao cliente
+        saida.writeObject("Lista Salva!");//envia uma string com o nick e o nome dos pacientes em risco separados por "#"
         
         saida.close();//Encerra a conexão com o cliente
     }

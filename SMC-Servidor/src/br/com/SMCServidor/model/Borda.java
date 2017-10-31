@@ -5,13 +5,13 @@
  */
 package br.com.SMCServidor.model;
 
-import java.util.Objects;
+import java.io.Serializable;
 
 /**
  *
  * @author Antonio Raian
  */
-public class Borda {
+public class Borda implements Serializable{
     private String endereco, porta;
     private final double cordenadaX, cordenadaY;
 
@@ -64,5 +64,10 @@ public class Borda {
                 return false;
         }
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return endereco + ", " + porta + ", " + cordenadaX + ", " + cordenadaY ;
     }
 }

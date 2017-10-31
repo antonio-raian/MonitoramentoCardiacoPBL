@@ -5,16 +5,18 @@
  */
 package br.com.SMCServidor.model;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Antonio Raian
  */
 //Classe modelo para a criação de médicos no sistema
-public class Medico {
+public class MedicoNuvem implements Serializable{
     private String nome, login, senha; //atributos para identificação do médico
 
     //construtor
-    public Medico(String nome, String login, String senha) {
+    public MedicoNuvem(String nome, String login, String senha) {
         this.nome = nome;
         this.login = login;
         this.senha = senha;

@@ -7,9 +7,12 @@ package br.com.SMCServidor.view;
 
 import br.com.SMCServidor.conection.ServerTCP;
 import br.com.SMCServidor.conection.ServerUDP;
-import br.com.SMCServidor.controller.Controller;
+import br.com.SMCServidor.controller.ControllerNuvem;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 
 /**
@@ -18,7 +21,7 @@ import javax.swing.JOptionPane;
  */
 //Tela inicial do sistema
 public class Inicio extends javax.swing.JDialog {
-    private Controller ctrl; //Variável onde será armazenado os dados dos clientes
+    private ControllerNuvem ctrl; //Variável onde será armazenado os dados dos clientes
     private ServerTCP serverTCP; //Variavel para estabelecer conexão TCP
     private ServerUDP serverUDP; //Variavel para estabelecer conexão UDP
     /**
@@ -27,6 +30,7 @@ public class Inicio extends javax.swing.JDialog {
     public Inicio(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        init();
     }
 
     /**
@@ -45,7 +49,9 @@ public class Inicio extends javax.swing.JDialog {
         btnStart = new javax.swing.JButton();
         btnStop = new javax.swing.JButton();
         lbConexao = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
+        jScrollList = new javax.swing.JScrollPane();
+        listConect = new javax.swing.JList<>();
+        btnConect = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Servidor");
@@ -100,10 +106,12 @@ public class Inicio extends javax.swing.JDialog {
         lbConexao.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         lbConexao.setText("Desconectado");
 
-        jButton1.setText("Conectados");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        jScrollList.setViewportView(listConect);
+
+        btnConect.setText("Conectados");
+        btnConect.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                btnConectActionPerformed(evt);
             }
         });
 
@@ -112,22 +120,27 @@ public class Inicio extends javax.swing.JDialog {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnStart, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(btnStop, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addContainerGap()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(btnStart, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(btnStop, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel1)
+                                .addGap(18, 18, 18)
+                                .addComponent(lbConexao))
+                            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addGap(18, 18, 18)
-                        .addComponent(lbConexao))
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(30, 30, 30)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(93, 93, 93)
+                                .addComponent(btnConect))
+                            .addComponent(jScrollList, javax.swing.GroupLayout.PREFERRED_SIZE, 272, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButton1)
-                .addGap(120, 120, 120))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -138,14 +151,15 @@ public class Inicio extends javax.swing.JDialog {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lbConexao, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGap(2, 2, 2)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnStart, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnStop, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnConect)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton1)
+                .addComponent(jScrollList, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -154,16 +168,20 @@ public class Inicio extends javax.swing.JDialog {
 
     //Metodo para ação do clique no botão Start
     private void btnStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStartActionPerformed
-        this.ctrl = new Controller();//instancia de um novo controlador
+        
         try {
+            this.ctrl = new ControllerNuvem();//instancia de um novo controlador
             //Abre conexão TCP
             this.serverTCP = new ServerTCP(Integer.parseInt(txtPorta.getText()), ctrl);
             //Abre conexão UDP
             this.serverUDP = new ServerUDP(Integer.parseInt(txtPorta.getText()), ctrl);
+            btnConect.setVisible(true);
             lbConexao.setText(InetAddress.getLocalHost().getHostAddress()+":"+txtPorta.getText());//muda informação da tela para IP e porta de conexão
         } catch (IOException ex) {
             //Mostra mensagem de falha na inicialização de um dos servidores
             JOptionPane.showMessageDialog(null, "Não foi possível iniciar o servidor");
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Inicio.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_btnStartActionPerformed
 
@@ -179,9 +197,17 @@ public class Inicio extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_btnStopActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        
-    }//GEN-LAST:event_jButton1ActionPerformed
+    private void btnConectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConectActionPerformed
+        String str[] = ctrl.getBordas();
+        System.out.println(str.length);
+        if(str.length!=0){
+            DefaultListModel listmodel = new DefaultListModel();
+            for(String s:str)
+                listmodel.addElement(s);
+            listConect.setModel(listmodel);
+            listConect.setVisible(true);
+        }
+    }//GEN-LAST:event_btnConectActionPerformed
 
     /**
      * @param args the command line arguments
@@ -226,13 +252,20 @@ public class Inicio extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnConect;
     private javax.swing.JButton btnStart;
     private javax.swing.JButton btnStop;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollList;
     private javax.swing.JLabel lbConexao;
+    private javax.swing.JList<String> listConect;
     private javax.swing.JTextField txtPorta;
     // End of variables declaration//GEN-END:variables
+    
+    private void init(){
+        btnConect.setVisible(false);
+        listConect.setVisible(false);
+    }
 }

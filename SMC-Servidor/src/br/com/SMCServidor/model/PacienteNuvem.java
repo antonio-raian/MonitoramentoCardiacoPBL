@@ -12,14 +12,14 @@ import java.io.Serializable;
  * @author raymendesjr
  */
 //Classe modelo para criação de novos pacientes do sistema
-public class Paciente implements Serializable{
+public class PacienteNuvem implements Serializable{
     private String nick, nome, senha;//Atributos para identificação
     private int ritmo, movimento, pressaoSis, pressaoDi;//Dados sobre o monitoramento cardíaco
     private boolean prioridade;//Variavel que define se ele é ou não prioridade
     private String borda;
 
     //Construtor
-    public Paciente(String nick,String nome, String senha, int movimento, int ritmo, int sistole, int diastole) {
+    public PacienteNuvem(String nick,String nome, String senha, int movimento, int ritmo, int sistole, int diastole) {
         //this.id = contador++;
         this.nick = nick;
         this.nome = nome;
@@ -104,7 +104,7 @@ public class Paciente implements Serializable{
     }
     
     /*Metodo toString que retorna todas as informações do 
-    Paciente, pronto para ser lido pelo protocolo de comunicação*/
+    PacienteNuvem, pronto para ser lido pelo protocolo de comunicação*/
     @Override
     public String toString() { 
         return nick+ "#" + nome + "#" + movimento + "#" + ritmo + "#" + pressaoSis +"#"+pressaoDi;
@@ -113,8 +113,8 @@ public class Paciente implements Serializable{
     //Metodo que compara se dois objetos são iguais
     @Override
     public boolean equals(Object obj) {
-        if(obj instanceof Paciente){
-            Paciente p =(Paciente) obj;
+        if(obj instanceof PacienteNuvem){
+            PacienteNuvem p =(PacienteNuvem) obj;
             if(this.nick.equals(p.nick))
                 return true;
         }
