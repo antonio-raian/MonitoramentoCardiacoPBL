@@ -27,8 +27,10 @@ public class UpdateSensor extends java.awt.Dialog {
      */
     private String endereco;
     private int porta;
-    public UpdateSensor(java.awt.Frame parent, boolean modal, String endereco, String porta) throws IOException, ClassNotFoundException {
+    public UpdateSensor(java.awt.Frame parent, boolean modal, String nick, String nome, String endereco, String porta) throws IOException, ClassNotFoundException {
         super(parent, modal);
+        this.nick = nick;
+        this.nome = nome;
         this.endereco = endereco;
         this.porta = Integer.parseInt(porta);
         conection();
@@ -37,8 +39,8 @@ public class UpdateSensor extends java.awt.Dialog {
     }
     public UpdateSensor(java.awt.Frame parent, boolean modal) throws IOException, ClassNotFoundException {
         super(parent, modal);
-        init();
         initComponents();
+        init();
     }
 
     /**
@@ -406,13 +408,23 @@ public class UpdateSensor extends java.awt.Dialog {
     //Metodo que faz a conexão com o servidor
     private void conection() throws IOException{
         conect = new ConectionSensor(endereco, porta);//Cria-se uma instancia para a classe de conexão
-        conect.conectar();//Usa o metodo de conexão
+        
     }
     
-    //Metodo que inicia o combobox
+    //Metodo que inicia os valores na tela
     private void init() throws IOException, ClassNotFoundException{
-        conection();//conecta-se ao servidor
+        conect.conectar();//Usa o metodo de conexão
         lbNomeNick.setText(nick+" - "+nome);
+        String s = conect.getPaciente(nick);
+        if(!s.equals("$FALHA$")){
+            String[] aux0 = s.split("#");
+            slMove.setValue(Integer.parseInt(aux0[2]));
+            slRitmo.setValue(Integer.parseInt(aux0[3]));
+            lbRitmo.setText(aux0[3]);
+            slSistole.setValue(Integer.parseInt(aux0[4]));
+            slDiastole.setValue(Integer.parseInt(aux0[5]));
+            labelMovimento();labelPressao();
+        }
         //Função q fica atualizando a cada 5 segundos
         timer.scheduleAtFixedRate(new TimerTask() {
             public void run() {
@@ -433,7 +445,7 @@ public class UpdateSensor extends java.awt.Dialog {
         int move = slMove.getValue(), sistole = slSistole.getValue(),diastole = slDiastole.getValue();
         int ritmo = slRitmo.getValue();
         
-        conection();//Conecta-se ao servidor
+        conect.conectar();//Usa o metodo de conexão
         String s = conect.atualizarSensor(nick,nome, move, ritmo, sistole, diastole);//Envia os dados para atualização
         if(s.equals("$FALHA$")){//Se a resposta do servidor for FALHA
             throw new IOException("Falha ao atualizar!");//é lançada a exceção de falha

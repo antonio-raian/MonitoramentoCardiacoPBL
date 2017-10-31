@@ -20,9 +20,9 @@ import java.net.UnknownHostException;
  */
 //Classe resopnsável por fazer a conexão das telas com o servidor
 public class ConectionSensor{
-    private Socket serverTCP;
-    private ObjectOutputStream saidaTCP;
-    private ObjectInputStream entradaTCP;
+    private Socket serverTCP; //Objeto responsável pela conexão com o servidor via TCP
+    private ObjectOutputStream saidaTCP; //Objeto que fica esperando informação na saída do Cliente via TCP
+    private ObjectInputStream entradaTCP; //objeto para a entrada de informações do cliente via TCP
     private DatagramSocket serverUDP; //Objeto responsável pela conexão com o servidor
     private byte[] saidaUDP; //Objeto que envia informação para o servidor
     private final byte[] entradaUDP = new byte[1024]; //Objeto que recebe informação do servidor

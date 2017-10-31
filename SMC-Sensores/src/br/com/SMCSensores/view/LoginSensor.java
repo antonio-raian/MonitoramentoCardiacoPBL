@@ -191,13 +191,18 @@ public class LoginSensor extends javax.swing.JDialog {
             if (resp!=null){
                 //Se for verdadeiro cria-se uma instancia para a tela de update de dados do paciente
                 String[] aux = resp.split("#");
-                UpdateSensor up = new UpdateSensor(parent, true, aux[0], aux[1]);
-                up.setVisible(true);//Torna-a visível
+                setVisible(false);
+                try{                    
+                    UpdateSensor up = new UpdateSensor(parent, true, aux[0], aux[1], aux[2], aux[3]);
+                    up.setVisible(true);//Torna-a visível
+                }catch(ArrayIndexOutOfBoundsException e){
+                    UpdateSensor up = new UpdateSensor(parent, true, aux[0], aux[1], endereco, ""+porta);
+                    up.setVisible(true);//Torna-a visível
+                }
+                dispose();
             }else{
                 JOptionPane.showMessageDialog(null, "Favor tentar novamente, login inexistente!");
             }
-            setVisible(false);
-            dispose();
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(null, "Erro na conexão!");
         } catch (ClassNotFoundException ex) {

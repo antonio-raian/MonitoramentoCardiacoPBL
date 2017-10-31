@@ -71,8 +71,6 @@ public class AddSensor extends java.awt.Dialog {
 
         jLabel9.setText("Senha:");
 
-        txtSenha.setText("jPasswordField1");
-
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -176,9 +174,9 @@ public class AddSensor extends java.awt.Dialog {
             conect.conectar();//Conecta-se ao servidor
             String resp = conect.salvarSensor(nick, nome, senha);//Solicita o salvamento passando os dados da tela
             System.out.println(resp);
-            if(resp.equals("$FALHA$"))//Se a resposta for FALHA, mostra um Jpanel
+            if(resp == null)//Se a resposta for FALHA, mostra um Jpanel
                 JOptionPane.showMessageDialog(null, "Nick já cadastrado, tente outro!");
-            else if(resp.equals("$CADASTRADO$")){//Se a resposta for CADASTRADO, mostra um Jpanel
+            else if(resp.equals("CADASTRADO")){//Se a resposta for CADASTRADO, mostra um Jpanel
                 JOptionPane.showMessageDialog(null, "Cliente Cadastrado com sucesso!");
                 setVisible(false);//fecha a tela
                 dispose();
