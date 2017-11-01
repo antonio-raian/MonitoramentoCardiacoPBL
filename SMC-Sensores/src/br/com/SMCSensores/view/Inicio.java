@@ -6,8 +6,6 @@
 package br.com.SMCSensores.view;
 
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 /**

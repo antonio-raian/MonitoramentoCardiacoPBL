@@ -192,11 +192,13 @@ public class LoginSensor extends javax.swing.JDialog {
         try {
             //verifica a autenticidade dos dados informados
             if(!txtCoordX.equals("")&&!txtCoordY.equals("")){
+                //Metodo que faz a validação do sensor
                 String resp = conect.autentica(txtLogin.getText(), new String(txtSenha.getPassword()), txtCoordX.getText(), txtCoordY.getText());
                 if (resp!=null){
                     //Se for verdadeiro cria-se uma instancia para a tela de update de dados do paciente
                     String[] aux = resp.split("#");
                     
+                    //Aqui inicia a tela de Updade passando a nova borda, ou a núvem
                     try{                    
                         UpdateSensor up = new UpdateSensor(parent, true, aux[0], aux[1],endereco, ""+porta, aux[2], aux[3]);
                         up.setVisible(true);//Torna-a visível

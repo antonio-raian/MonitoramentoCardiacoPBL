@@ -97,20 +97,23 @@ public class ConectionSensor{
         return new String(sendInfo.getData(),0,sendInfo.getLength()); // retorna informação pra View
     }
     
+    //Metodo responsável por mudar o sensor de lugar
     public String mudarCoordenadas(String nick, String coordenadaX, String coordenadaY) throws IOException, ClassNotFoundException{
-        serverTCP = new Socket(enderecoNuvem, portaNuvem);
+        serverTCP = new Socket(enderecoNuvem, portaNuvem);//Usa conexão TCP
         saidaTCP = new ObjectOutputStream(serverTCP.getOutputStream());
-        saidaTCP.writeObject("SENSOR#MUDARCOORDENADA#"+nick+"#"+coordenadaX+"#"+coordenadaY);
+        saidaTCP.writeObject("SENSOR#MUDARCOORDENADA#"+nick+"#"+coordenadaX+"#"+coordenadaY);//Concatena as novas coordenadas e manda pra núvem
         entradaTCP = new ObjectInputStream(serverTCP.getInputStream());
-        return (String)entradaTCP.readObject();
+        return (String)entradaTCP.readObject();//Retorna uma borda ou null (nesse caso usamos a nuvem como servidor)
     }
     
+    //Metodo que envia as informaçãos de autenticação
     public String autentica(String nick, String senha, String coordenadaX, String coordenadaY) throws IOException, ClassNotFoundException{
-        serverTCP = new Socket(enderecoNuvem, portaNuvem);
+        serverTCP = new Socket(enderecoNuvem, portaNuvem);//Usa conexão TCP
         saidaTCP = new ObjectOutputStream(serverTCP.getOutputStream());
+        //Envia as informação do paciente e as coordenadas para aloca-lo a uma borda
         saidaTCP.writeObject("SENSOR#AUTENTICA#"+nick+"#"+senha+"#"+coordenadaX+"#"+coordenadaY);
         entradaTCP = new ObjectInputStream(serverTCP.getInputStream());
-        return (String)entradaTCP.readObject();
+        return (String)entradaTCP.readObject();//Retorna uma borda ou null (nesse caso usamos a nuvem como servidor)
     }
     //----------------------------------------------------------
     //Metodo responsavel por fazer conexão com servidor

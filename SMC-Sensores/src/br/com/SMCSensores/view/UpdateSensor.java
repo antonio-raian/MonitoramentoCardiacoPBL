@@ -25,10 +25,11 @@ public class UpdateSensor extends java.awt.Dialog {
      * @param parent
      * @param modal
      */
-    private String endNuvem;
-    private int portaNuvem;
-    private String endBorda;
-    private int portaBorda;
+    private String endNuvem;//Variavél que armazena o endereço da Nuvem
+    private int portaNuvem;//Variavél que armazena a porta da Nuvem
+    private String endBorda;//Variavél que armazena o endereço da Borda
+    private int portaBorda;//Variavél que armazena a porta da Borda
+    //Construtor caso exista uma borda ativa, os endereçõs de nuvem e borda são distintos
     public UpdateSensor(java.awt.Frame parent, boolean modal, String nick, String nome, String endNuvem, String portaNuvem, String endBorda, String portaBorda) throws IOException, ClassNotFoundException {
         super(parent, modal);
         this.nick = nick;
@@ -42,6 +43,7 @@ public class UpdateSensor extends java.awt.Dialog {
         init();
     }    
     
+    //Construtor caso NÃO exista uma borda ativa, os endereços de nuvem e borda são iguais
     UpdateSensor(java.awt.Frame parent, boolean modal, String nick, String nome, String endereco, String porta) throws IOException, ClassNotFoundException {
         super(parent, modal);
         this.nick = nick;
@@ -378,13 +380,18 @@ public class UpdateSensor extends java.awt.Dialog {
         lbPressao.setText(labelPressao());
     }//GEN-LAST:event_slDiastoleMouseDragged
 
+    //Ação do botão de mover, aquei vc muda as coodenadas do sensor
     private void btnMoverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMoverActionPerformed
         try {
             if(!txtCoordX.equals("")&&!txtCoordY.equals("")){
+                //Metodo mudarCoordenadas responsável por enviar as novas coordenadas
                 String[] s = (conect.mudarCoordenadas(nick, txtCoordX.getText(), txtCoordY.getText())).split("#");
-                if(s.length>1){
+                if(s.length>1){//Se for maior que 1, muda para a nova borda
                     endBorda = s[0];
                     portaBorda = Integer.parseInt(s[1]);
+                }else{//Se não, as bordas estão desativas, volta para a nuvem
+                    endBorda = endNuvem;
+                    portaBorda = portaNuvem;
                 }
             }else{
                 JOptionPane.showMessageDialog(null, "Favor indicar a localização!");
@@ -474,7 +481,8 @@ public class UpdateSensor extends java.awt.Dialog {
             lbRitmo.setText(aux0[3]);
             slSistole.setValue(Integer.parseInt(aux0[4]));
             slDiastole.setValue(Integer.parseInt(aux0[5]));
-            labelMovimento();labelPressao();
+            lbMove.setText(labelMovimento());
+            lbPressao.setText(labelPressao());
         }
         //Função q fica atualizando a cada 5 segundos
         timer.scheduleAtFixedRate(new TimerTask() {
