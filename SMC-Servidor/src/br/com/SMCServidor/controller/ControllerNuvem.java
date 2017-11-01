@@ -73,6 +73,7 @@ public class ControllerNuvem {
         return false;
     }
     
+    //Metodo responsável por permitir que o Paciente seja redirecionado para uma nova borda
     public String atualizarLocalSensor(String nick,String cordenadaX, String cordenadaY){
         String borda=null;
         for(PacienteNuvem p:pacientes){
@@ -84,13 +85,16 @@ public class ControllerNuvem {
         return borda;
     }
     
+    //Metodo que encontra a borda mais próxima do sensor
+    //Foi usado uma fórmula matemática para encontrar a menor distancia 
+    //FÓRMULA: raizQuadrada[(coordenadaXBorda-coordenadaXSensor)^2+(coordenadaYBorda-coordenadaYSensor)^2]
     public String alocarPaciente(double x, double y){
         String menorDistancia = null;
         if(!bordas.isEmpty()){
             double menor = Math.sqrt(Math.pow(bordas.get(0).getCordenadaX()-x,2)+Math.pow(bordas.get(0).getCordenadaY()-y,2));;
             menorDistancia = bordas.get(0).getEndereco()+"#"+bordas.get(0).getPorta();
             double valor;        
-            for(Borda b:bordas){
+            for(Borda b:bordas){//Faz a verificação para todas as bordas ativas
                 valor = Math.sqrt(Math.pow(b.getCordenadaX()-x,2)+Math.pow(b.getCordenadaY()-y,2));
                 if(valor<menor){
                     menorDistancia = b.getEndereco()+"#"+b.getPorta();
@@ -100,10 +104,11 @@ public class ControllerNuvem {
         return menorDistancia;
     }
 
+    //Metodo que faz a autenticação do sensor e encontra a melhor borda
     public String autenticaSensor(String nick, String senha, String x, String y) {
         for(PacienteNuvem p:pacientes){
             if(p.getNick().equals(nick)&&p.getSenha().equals(senha))
-                p.setBorda(alocarPaciente(Integer.parseInt(x), Integer.parseInt(y)));
+                p.setBorda(alocarPaciente(Integer.parseInt(x), Integer.parseInt(y)));//Encontra a melhor borda
                 return p.getNick()+"#"+p.getNome()+"#"+p.getBorda();
         }
         
@@ -212,8 +217,10 @@ public class ControllerNuvem {
     }
     
     //--------------------------------------------------------
+    //Metodo que adiciona uma nova borda à rede
     public boolean novaBorda(String endereco, String porta, double x, double y){
         Borda b = new Borda(endereco, porta, x, y);
+        //Verificação para não ter duas bordas com mesma localização e porta
         if(bordas.contains(b))
             return false;
         else{
@@ -222,6 +229,7 @@ public class ControllerNuvem {
         }
     }
     
+    //Metodo que desativa a borda
     public void removeBorda(String host) {
         for(Borda b:bordas){
             if(b.getEndereco().equals(host)){
@@ -230,7 +238,7 @@ public class ControllerNuvem {
             }
         }
     }
-    
+    //Metodo que retorna todas as bordas ativas
     public String[] getBordas(){
         String[] str = new String[bordas.size()];
         int i =0;
@@ -241,6 +249,7 @@ public class ControllerNuvem {
         return str;
     }
 
+    //Metodo que retorna o endereço e a porta da borda que o paciente está conectado
     public String getPacienteBorda(String nick) {
         String borda = null;
         for(PacienteNuvem p:pacientes){
@@ -250,10 +259,11 @@ public class ControllerNuvem {
         return borda;
     }
 
+    //Metodo que salva no histórico quando o paciente está num estado grave
     public void setPacienteRisco(String pacientes) throws IOException {
         if(!pacientes.equals("null")){
             String[] str = pacientes.split("/");
-            historico.add(str[0]);
+            historico.add(pacientes);
             atualizarDadosPaciente(str[0], str[2], str[3], str[4], str[5]);
             salvarArquivo("Historico.txt", historico);
         }
@@ -307,6 +317,7 @@ public class ControllerNuvem {
         }
     }
     
+    //Método que armazena as informaç~es da memoria Ram em arquivos da memória rom
     private void salvarArquivo(String nome, LinkedList dados) throws FileNotFoundException, IOException{
         File arq = new File(diretorio,nome);
         arq.createNewFile();
@@ -315,13 +326,14 @@ public class ControllerNuvem {
         oos.close();
     }
     
+    //Metodo que lê as informação dos arquivos da ROM para a RAM
     private LinkedList lerArquivo(File arq) throws IOException, ClassNotFoundException{
         ObjectInputStream ois = new ObjectInputStream(new FileInputStream(arq));//Usa o Stream pra ler os arquivos
         LinkedList lista =  (LinkedList) ois.readObject();//Lê e armazena a lista na memória flash
         ois.close();
         return lista;
     }
-    
+    //Método que verifica se as bordas do arquivo está ativa
     private void verificaBordas() throws IOException{
         for(Borda b:bordas){
             try{

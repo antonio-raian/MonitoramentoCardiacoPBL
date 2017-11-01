@@ -12,9 +12,10 @@ import java.io.Serializable;
  * @author Antonio Raian
  */
 public class Borda implements Serializable{
-    private String endereco, porta;
-    private final double cordenadaX, cordenadaY;
+    private String endereco, porta;//Atributos para conexão
+    private final double cordenadaX, cordenadaY;//Atributos para encontrar a localização
 
+    //Contrutor
     public Borda(String endereco, String porta, double cordenadaX, double cordenadaY) {
         this.endereco = endereco;
         this.porta = porta;
@@ -22,6 +23,7 @@ public class Borda implements Serializable{
         this.cordenadaY = cordenadaY;
     }
 
+    //Geters e Setrs
     public String getEndereco() {
         return endereco;
     }

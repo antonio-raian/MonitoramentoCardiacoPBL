@@ -200,8 +200,8 @@ public class Inicio extends javax.swing.JDialog {
     }//GEN-LAST:event_btnStopActionPerformed
 
     private void btnConectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConectActionPerformed
-        String str[] = ctrl.getBordas();
-        System.out.println(str.length);
+        String str[] = ctrl.getBordas();//Carrega as bordas que estão conectadas à núvem
+        //Se tiverlaguma coloca em um listmodel para ser apresentado numa lista
         if(str.length!=0){
             DefaultListModel listmodel = new DefaultListModel();
             for(String s:str)

@@ -211,6 +211,7 @@ public class AtividadeServidorPrincipal extends Thread{
     }
     
     //Módulo dos servidores de borda
+    //Metodo para adição de uma nova borda
     private void novaBorda(String endereco, String porta, String x, String y) throws IOException {
         saida = new ObjectOutputStream(clienteTCP.getOutputStream());//Estabelece uma forma de conectar-se ao cliente
         if(ctrl.novaBorda(endereco, porta, Double.parseDouble(x), Double.parseDouble(y))){
@@ -221,6 +222,7 @@ public class AtividadeServidorPrincipal extends Thread{
         saida.close();//Encerra a conexão com o cliente
     }
     
+    //Metodo para a remoção da borda
     private void removeBorda(String host) throws IOException {
         ctrl.removeBorda(host);
         saida = new ObjectOutputStream(clienteTCP.getOutputStream());//Estabelece uma forma de conectar-se ao cliente
@@ -229,6 +231,7 @@ public class AtividadeServidorPrincipal extends Thread{
         saida.close();//Encerra a conexão com o cliente
     }
     
+    //Metodo que salva no controlador os pacientes em risco
     private void pacienteRisco(String pacientes) throws IOException {
         ctrl.setPacienteRisco(pacientes);
         saida = new ObjectOutputStream(clienteTCP.getOutputStream());//Estabelece uma forma de conectar-se ao cliente
@@ -237,6 +240,7 @@ public class AtividadeServidorPrincipal extends Thread{
         saida.close();//Encerra a conexão com o cliente
     }
 
+    //Metodo para solicitar a alteração da coordenada do sensor
     private void mudarcoordenada(String nick, String coordenadaX, String coordenadaY) throws IOException {
         String c = ctrl.atualizarLocalSensor(nick, coordenadaX, coordenadaY);
         saida = new ObjectOutputStream(clienteTCP.getOutputStream());
