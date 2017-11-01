@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
-import java.util.Stack;
 import java.util.Timer;
 
 /**
@@ -82,6 +81,7 @@ public class Controller {
         }  
     }
     
+    //Envia para a núvem o paciente que estiver em risco
     public void sendPacienteRisco(Paciente p) throws IOException, ClassNotFoundException{
         conexao.enviaPacientes(p.getNick()+"/"+p.getNome()+"/"+p.getMovimento()+"/"+p.getRitmo()+"/"+p.getSistole()+"/"+p.getDiastole());
     }

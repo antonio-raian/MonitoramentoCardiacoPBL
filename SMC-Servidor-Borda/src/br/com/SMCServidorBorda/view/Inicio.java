@@ -278,12 +278,15 @@ public class Inicio extends javax.swing.JDialog {
         try {
             conecta();
             if(!portaLocal.equals("") && !cordeX.equals("") && !cordeY.equals("")){
+                //Solicita a adição de uma nova borda e informa o endereço, a porta e as coordenadas x e Y
                 String resp = conexao.novaBorda(InetAddress.getLocalHost().getHostAddress(), portaLocal, cordeX, cordeY);
-            JOptionPane.showMessageDialog(null, resp);
-            btnConect.setVisible(true);
-            //Abre conexão UDP
-            this.serverUDP = new ServerUDP(Integer.parseInt(txtPortaLocal.getText()), ctrl);
-            lbConexao.setText(InetAddress.getLocalHost().getHostAddress()+":"+txtPortaLocal.getText());//muda informação da tela para IP e porta de conexão
+                JOptionPane.showMessageDialog(null, resp);
+                if(resp.equals("Borda Cadastrada!")){
+                    btnConect.setVisible(true);
+                    //Abre conexão UDP
+                    this.serverUDP = new ServerUDP(Integer.parseInt(txtPortaLocal.getText()), ctrl);
+                    lbConexao.setText(InetAddress.getLocalHost().getHostAddress()+":"+txtPortaLocal.getText());//muda informação da tela para IP e porta de conexão
+                }
             }else{
                 JOptionPane.showMessageDialog(null, "Favor preencher todos os campos!");
             }
@@ -298,9 +301,12 @@ public class Inicio extends javax.swing.JDialog {
     //Metodo para ação do clique no botão Stop
     private void btnStopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStopActionPerformed
         try {
+            //Solicita a desabilitação da borda e sua remoção da lista de bordas do sistema
             String resp = conexao.removeBorda(InetAddress.getLocalHost().getHostAddress());
             JOptionPane.showMessageDialog(null, resp);
             serverUDP.stop();//acessa ao metodo da thread
+            btnConect.setVisible(false);
+            listConect.setVisible(false);
             lbConexao.setText("Desconectado");//muda informação da tela para Desconectado
         } catch (IOException | NullPointerException ex) {
             //mostra mensagem caso não tenha servidores ativos
@@ -310,10 +316,12 @@ public class Inicio extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_btnStopActionPerformed
 
+    //Botão usado para mostrar todas as conexões
     private void btnConectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConectActionPerformed
-        String str[] = ctrl.getAll();
+        String str[] = ctrl.getAll();//Metodo que encontra todos os conectados
         System.out.println(str.length);
         if(str.length!=0){
+            //Depois de encontrado, todos vão para uma lista que é apresentada na tela
             DefaultListModel listmodel = new DefaultListModel();
             for(String s:str)
                 listmodel.addElement(s);

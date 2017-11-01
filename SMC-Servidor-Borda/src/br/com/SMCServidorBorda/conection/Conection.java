@@ -27,6 +27,7 @@ public class Conection {
         this.porta = Integer.parseInt(porta);
     }
     
+    //Metodo que solicita a adição de uma nova borda na Rede
     public String novaBorda(String host, String porta, String coordenadaX, String coordenadaY) throws IOException, ClassNotFoundException{
         conectar();
         saida = new ObjectOutputStream(server.getOutputStream());
@@ -37,6 +38,7 @@ public class Conection {
         return s;
     }
     
+    //Metodo que solicita a remoção(desativação) de uma borda da rede
     public String removeBorda(String host) throws IOException, ClassNotFoundException{
         conectar();
         saida = new ObjectOutputStream(server.getOutputStream());
@@ -47,6 +49,7 @@ public class Conection {
         return s;
     }
     
+    //Metodo usado para mandar para a nuvem os pacientes em risco
     public String enviaPacientes(String info) throws IOException, ClassNotFoundException{
         conectar();
         saida = new ObjectOutputStream(server.getOutputStream());
