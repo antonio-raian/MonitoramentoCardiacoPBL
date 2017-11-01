@@ -184,8 +184,7 @@ public class TelaInicial extends javax.swing.JDialog {
 
     //action do botão de detalhamento de paciente
     private void btnDetalhesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDetalhesActionPerformed
-        try {
-            
+        try {            
             String[] s = conect.getBordaPaciente(txtNick.getText()).split("#");
             System.out.println("Borda:"+s);
             if(s.length>=2){
@@ -215,9 +214,18 @@ public class TelaInicial extends javax.swing.JDialog {
         int linha = tabelaPaciente.getSelectedRow();
         if(linha>=0){
             try {
-                //Cria-se uma instancia para tela de detalhes passando o nick
-                DetalhePaciente dtPaciente = new DetalhePaciente(parent, true, endereco, porta, (String)tabelaPaciente.getValueAt(linha, 1));
-                dtPaciente.setVisible(true);//torna-a visivel
+                String nick = (String)tabelaPaciente.getValueAt(linha, 1);
+                String[] s = conect.getBordaPaciente(nick).split("#");
+                if(s.length>=2){
+                    System.out.println("Borda:"+s[0]+":"+s[1]);
+                    //Cria-se uma instancia para tela de detalhes passando o nick
+                    DetalhePaciente dtPaciente = new DetalhePaciente(parent, true, s[0], Integer.parseInt(s[1]), nick);
+                    dtPaciente.setVisible(true);//torna-a visivel
+                }else{
+                    //Cria-se uma instancia para tela de detalhes passando o nick
+                    DetalhePaciente dtPaciente = new DetalhePaciente(parent, true, endereco, porta, nick);
+                    dtPaciente.setVisible(true);//torna-a visivel
+                }
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(null, "Não conseguiu conectar ao servidor!");
             } catch (ClassNotFoundException ex) {

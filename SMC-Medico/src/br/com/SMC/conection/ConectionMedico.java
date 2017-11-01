@@ -78,7 +78,7 @@ public class ConectionMedico {
     //Metodo que solicita as informações de um paciente a partir de um nick
     public String getPaciente (String nick) throws IOException{
         conectaUDP();
-        saidaUDP =("MEDICO#GET_PACIENTE#"+nick+"#").getBytes();//Solicita a lista de prioritários ao Servidor
+        saidaUDP =("MEDICO#GET_PACIENTE#"+nick).getBytes();//Solicita a lista de prioritários ao Servidor
         //Cria um pacote para envio ao servidor
         DatagramPacket sendInfo = new DatagramPacket(saidaUDP, saidaUDP.length, InetAddress.getByName(endereco), porta);
         serverUDP.send(sendInfo);//Envia o pacote ao servidor
@@ -90,7 +90,7 @@ public class ConectionMedico {
     
     public String getBordaPaciente(String nick) throws SocketException, IOException {
         conectaUDP();
-        saidaUDP =("MEDICO#GET_BORDA#"+nick+"#").getBytes();//Solicita a lista de prioritários ao Servidor
+        saidaUDP =("MEDICO#GET_BORDA#"+nick).getBytes();//Solicita a lista de prioritários ao Servidor
         //Cria um pacote para envio ao servidor
         DatagramPacket sendInfo = new DatagramPacket(saidaUDP, saidaUDP.length, InetAddress.getByName(endereco), porta);
         serverUDP.send(sendInfo);//Envia o pacote ao servidor

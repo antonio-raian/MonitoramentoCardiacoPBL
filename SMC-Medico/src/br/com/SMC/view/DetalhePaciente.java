@@ -238,6 +238,7 @@ public class DetalhePaciente extends javax.swing.JDialog {
     
     //Metodo que inicia os valores da tela
     private void init() throws IOException, ClassNotFoundException {
+        conecta();
         hist = new DefaultListModel<>();
         lbTitulo.setText("Detalhes Paciente "+nick);//Label com o nome do cliente
         
