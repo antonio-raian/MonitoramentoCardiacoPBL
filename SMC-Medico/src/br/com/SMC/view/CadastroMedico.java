@@ -7,8 +7,6 @@ package br.com.SMC.view;
 
 import br.com.SMC.conection.ConectionMedico;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 /**

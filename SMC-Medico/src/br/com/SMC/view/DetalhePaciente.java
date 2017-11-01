@@ -258,7 +258,7 @@ public class DetalhePaciente extends javax.swing.JDialog {
     //Metodo usado para coletar as informações do servidor e setar nos labels
     private void carregaDados() throws IOException, ClassNotFoundException{
         String str = conect.getPaciente(nick);//solicita as informações do paciente pelo nick
-        if(str.equals("$FALHA$")){//Se a resposta for NAO_ENCONTRADO
+        if(str.equals("$FALHA$")){//Se a resposta for $FALHA$
             JOptionPane.showMessageDialog(null, "Paciente "+nick+" não encontrado");//Mosta o erro na tela
         }else{
             String[] aux = str.split("#");//Separa as informações do pacientes vindas do servidor

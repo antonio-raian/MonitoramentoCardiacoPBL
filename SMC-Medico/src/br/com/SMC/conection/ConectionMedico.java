@@ -87,7 +87,7 @@ public class ConectionMedico {
         
         return new String(sendInfo.getData(), 0, sendInfo.getLength()); // retorna informação pra View
     }
-    
+    //Metodo que informa o nick e recebe de volta o endereço e a porta da borda do paciente
     public String getBordaPaciente(String nick) throws SocketException, IOException {
         conectaUDP();
         saidaUDP =("MEDICO#GET_BORDA#"+nick).getBytes();//Solicita a lista de prioritários ao Servidor
@@ -100,12 +100,13 @@ public class ConectionMedico {
         return new String(sendInfo.getData(), 0, sendInfo.getLength()); // retorna informação pra View
     }
     //----------------------------------------------------------
-    //Metodo responsavel por fazer conexão com servidor
+    //Metodo responsavel por fazer conexão TCP com servidor
     public void conectarTCP() throws IOException{
         serverTCP = new Socket(endereco,porta);
         saidaTCP = new ObjectOutputStream(serverTCP.getOutputStream());
     }
     
+    //Metodo responsavel por fazer conexão UDP com servidor
     public void conectaUDP() throws SocketException{
         serverUDP = new DatagramSocket();
     }

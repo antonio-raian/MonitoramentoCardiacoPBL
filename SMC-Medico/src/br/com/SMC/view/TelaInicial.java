@@ -185,12 +185,12 @@ public class TelaInicial extends javax.swing.JDialog {
     //action do botão de detalhamento de paciente
     private void btnDetalhesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDetalhesActionPerformed
         try {            
-            String[] s = conect.getBordaPaciente(txtNick.getText()).split("#");
-            System.out.println("Borda:"+s);
-            if(s.length>=2){
+            String[] s = conect.getBordaPaciente(txtNick.getText()).split("#");//Acessa o método que encontra a borda do paciente
+            if(s.length>=2){//Se a resposta for compostra é um servidor externo
+                System.out.println("Borda:"+s[0]+":"+s[1]);
                 DetalhePaciente dtPaciente = new DetalhePaciente(parent, true, s[0], Integer.parseInt(s[1]), txtNick.getText());
                 dtPaciente.setVisible(true);//torna-a visivel
-            }else{
+            }else{//Se não for composto, é a própria núvem
                 //Cria-se uma instancia para tela de detalhes passando o nick
                 DetalhePaciente dtPaciente = new DetalhePaciente(parent, true, endereco, porta, txtNick.getText());
                 dtPaciente.setVisible(true);//torna-a visivel
@@ -211,11 +211,11 @@ public class TelaInicial extends javax.swing.JDialog {
     }//GEN-LAST:event_btnLogoutActionPerformed
 
     private void tabelaPacienteMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabelaPacienteMouseClicked
-        int linha = tabelaPaciente.getSelectedRow();
+        int linha = tabelaPaciente.getSelectedRow();//Metodo que coleta a linha que foi selecionada
         if(linha>=0){
             try {
-                String nick = (String)tabelaPaciente.getValueAt(linha, 1);
-                String[] s = conect.getBordaPaciente(nick).split("#");
+                String nick = (String)tabelaPaciente.getValueAt(linha, 1);//Extrai o nick da linha selecionada
+                String[] s = conect.getBordaPaciente(nick).split("#");//Acessa o método que encontra a borda do paciente
                 if(s.length>=2){
                     System.out.println("Borda:"+s[0]+":"+s[1]);
                     //Cria-se uma instancia para tela de detalhes passando o nick
