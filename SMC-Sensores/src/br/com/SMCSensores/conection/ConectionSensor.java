@@ -26,13 +26,23 @@ public class ConectionSensor{
     private DatagramSocket serverUDP; //Objeto responsável pela conexão com o servidor
     private byte[] saidaUDP; //Objeto que envia informação para o servidor
     private final byte[] entradaUDP = new byte[1024]; //Objeto que recebe informação do servidor
-    private final InetAddress endereco; //Variavel q armazena o endereço da conexão
-    private final int porta;//Variável que armazena a porta da conexão
+    private InetAddress endBorda; //Variavel q armazena o endereço da conexão com a borda
+    private int portaBorda;//Variável que armazena a porta da conexão de borda
+    private InetAddress enderecoNuvem; //Variavel q armazena o endereço da conexão com a nuvem
+    private int portaNuvem;//Variável que armazena a porta da conexão da nuvem
 
     //Construtor que recebe as informações de endereço e porta de conexão;
-    public ConectionSensor(String host, int porta) throws UnknownHostException {
-        this.endereco = InetAddress.getByName(host);//Pega o endereço do host de conexão
-        this.porta = porta;//Seta a porta numa variavel global
+    public ConectionSensor(String endereco, int porta) throws UnknownHostException {
+        this.enderecoNuvem = InetAddress.getByName(endereco);//Pega o endereço do host de conexão
+        this.portaNuvem = porta;//Seta a porta numa variavel global
+    }
+    
+    //Construtor que recebe as informações de endereço e porta de conexão;
+    public ConectionSensor(String enderecoBorda, int portaBorda, String enderecoNuvem, int portaNuvem) throws UnknownHostException {
+        this.endBorda = InetAddress.getByName(enderecoBorda);//Pega o endereço do host de conexão
+        this.portaBorda = portaBorda;//Seta a porta numa variavel global
+        this.enderecoNuvem = InetAddress.getByName(enderecoNuvem);//Pega o endereço do host de conexão
+        this.portaNuvem = portaNuvem;
     }
     
     //O meio de comunicação com o servidor são sempre Strings com o formato:
@@ -42,7 +52,7 @@ public class ConectionSensor{
         //Concatena todas as infomações numa String e a transforma em uma cadeia de bytes
         saidaUDP = ("SENSOR#SALVAR#"+nick+"#"+nome+"#"+senha).getBytes();
         //Cria um pacote para envio ao servidor
-        DatagramPacket sendInfo = new DatagramPacket(saidaUDP, saidaUDP.length, endereco, porta);
+        DatagramPacket sendInfo = new DatagramPacket(saidaUDP, saidaUDP.length, enderecoNuvem, portaNuvem);
         serverUDP.send(sendInfo);//Envia o pacote ao servidor
         serverUDP.receive(sendInfo);//Espera uma resposta
         
@@ -54,7 +64,7 @@ public class ConectionSensor{
         //Concatena todas as infomações numa String e a transforma em uma cadeia de bytes
         saidaUDP = ("SENSOR#ATUALIZAR#"+nick+"#"+nome+"#"+move+"#"+ritmo+"#"+sistole+"#"+diastole).getBytes();
         //Cria um pacote para envio ao servidor
-        DatagramPacket sendInfo = new DatagramPacket(saidaUDP, saidaUDP.length, endereco, porta);
+        DatagramPacket sendInfo = new DatagramPacket(saidaUDP, saidaUDP.length, endBorda, portaBorda);
         serverUDP.send(sendInfo);//Envia o pacote ao servidor
         serverUDP.receive(sendInfo);//Espera uma resposta
         
@@ -66,7 +76,7 @@ public class ConectionSensor{
         //Concatena as informações necessárias para coletar a lista
         saidaUDP = ("SENSOR#LISTAR#").getBytes();
         //Cria um pacote para envio ao servidor
-        DatagramPacket sendInfo = new DatagramPacket(saidaUDP, saidaUDP.length, endereco, porta);
+        DatagramPacket sendInfo = new DatagramPacket(saidaUDP, saidaUDP.length, endBorda, portaBorda);
         serverUDP.send(sendInfo);//Envia o pacote ao servidor
         sendInfo = new DatagramPacket(entradaUDP, entradaUDP.length);
         serverUDP.receive(sendInfo);//Espera uma resposta
@@ -79,7 +89,7 @@ public class ConectionSensor{
         //Concatena as informações necessárias para coletar o paciente pelo nick
         saidaUDP = ("SENSOR#GET_PACIENTE#"+nick).getBytes();
         //Cria um pacote para envio ao servidor
-        DatagramPacket sendInfo = new DatagramPacket(saidaUDP, saidaUDP.length, endereco, porta);
+        DatagramPacket sendInfo = new DatagramPacket(saidaUDP, saidaUDP.length, endBorda, portaBorda);
         serverUDP.send(sendInfo);//Envia o pacote ao servidor
         sendInfo = new DatagramPacket(entradaUDP, entradaUDP.length);
         serverUDP.receive(sendInfo);//Espera uma resposta
@@ -87,8 +97,16 @@ public class ConectionSensor{
         return new String(sendInfo.getData(),0,sendInfo.getLength()); // retorna informação pra View
     }
     
+    public String mudarCoordenadas(String nick, String coordenadaX, String coordenadaY) throws IOException, ClassNotFoundException{
+        serverTCP = new Socket(enderecoNuvem, portaNuvem);
+        saidaTCP = new ObjectOutputStream(serverTCP.getOutputStream());
+        saidaTCP.writeObject("SENSOR#MUDARCOORDENADA#"+nick+"#"+coordenadaX+"#"+coordenadaY);
+        entradaTCP = new ObjectInputStream(serverTCP.getInputStream());
+        return (String)entradaTCP.readObject();
+    }
+    
     public String autentica(String nick, String senha, String coordenadaX, String coordenadaY) throws IOException, ClassNotFoundException{
-        serverTCP = new Socket(endereco, porta);
+        serverTCP = new Socket(enderecoNuvem, portaNuvem);
         saidaTCP = new ObjectOutputStream(serverTCP.getOutputStream());
         saidaTCP.writeObject("SENSOR#AUTENTICA#"+nick+"#"+senha+"#"+coordenadaX+"#"+coordenadaY);
         entradaTCP = new ObjectInputStream(serverTCP.getInputStream());

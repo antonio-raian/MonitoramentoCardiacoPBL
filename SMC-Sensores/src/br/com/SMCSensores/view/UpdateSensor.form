@@ -56,8 +56,8 @@
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Component id="jPanel1" min="-2" pref="191" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jPanel4" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="32767" attributes="0"/>
+              <Component id="jPanel4" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Component id="jPanel2" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
@@ -323,7 +323,7 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" alignment="0" attributes="0">
+              <Group type="102" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="jLabel9" alignment="0" min="-2" pref="172" max="-2" attributes="0"/>
@@ -334,7 +334,12 @@
                       <Component id="txtCoordX" alignment="0" min="-2" pref="190" max="-2" attributes="0"/>
                       <Component id="txtCoordY" alignment="0" min="-2" pref="190" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace pref="51" max="32767" attributes="0"/>
+                  <EmptySpace max="32767" attributes="0"/>
+              </Group>
+              <Group type="102" alignment="1" attributes="0">
+                  <EmptySpace max="32767" attributes="0"/>
+                  <Component id="btnMover" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="182" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -342,21 +347,18 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" alignment="0" attributes="0">
-                          <Component id="txtCoordX" max="32767" attributes="0"/>
-                          <EmptySpace min="-2" pref="51" max="-2" attributes="0"/>
-                      </Group>
-                      <Group type="102" alignment="0" attributes="0">
-                          <Component id="jLabel9" min="-2" pref="34" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="jLabel5" alignment="3" min="-2" pref="34" max="-2" attributes="0"/>
-                              <Component id="txtCoordY" alignment="3" min="-2" pref="34" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace max="32767" attributes="0"/>
-                      </Group>
+                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                      <Component id="jLabel9" max="32767" attributes="0"/>
+                      <Component id="txtCoordX" pref="34" max="32767" attributes="0"/>
                   </Group>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="jLabel5" alignment="3" min="-2" pref="34" max="-2" attributes="0"/>
+                      <Component id="txtCoordY" alignment="3" min="-2" pref="34" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace max="32767" attributes="0"/>
+                  <Component id="btnMover" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -375,6 +377,14 @@
         <Component class="javax.swing.JTextField" name="txtCoordX">
         </Component>
         <Component class="javax.swing.JTextField" name="txtCoordY">
+        </Component>
+        <Component class="javax.swing.JButton" name="btnMover">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Mover-se"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnMoverActionPerformed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>

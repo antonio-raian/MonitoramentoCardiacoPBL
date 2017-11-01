@@ -30,7 +30,7 @@ public class LoginSensor extends javax.swing.JDialog {
         this.endereco = endereco;
         this.porta = Integer.parseInt(porta);
         this.parent = aThis;
-        init();
+        conecta();
         initComponents();
     }
 
@@ -120,6 +120,10 @@ public class LoginSensor extends javax.swing.JDialog {
 
         jLabel4.setText("Coordenada X:");
 
+        txtCoordX.setText("1");
+
+        txtCoordY.setText("1");
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -187,21 +191,26 @@ public class LoginSensor extends javax.swing.JDialog {
     private void btnLogarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogarActionPerformed
         try {
             //verifica a autenticidade dos dados informados
-            String resp = conect.autentica(txtLogin.getText(), new String(txtSenha.getPassword()), txtCoordX.getText(), txtCoordY.getText());
-            if (resp!=null){
-                //Se for verdadeiro cria-se uma instancia para a tela de update de dados do paciente
-                String[] aux = resp.split("#");
-                setVisible(false);
-                try{                    
-                    UpdateSensor up = new UpdateSensor(parent, true, aux[0], aux[1], aux[2], aux[3]);
-                    up.setVisible(true);//Torna-a visível
-                }catch(ArrayIndexOutOfBoundsException e){
-                    UpdateSensor up = new UpdateSensor(parent, true, aux[0], aux[1], endereco, ""+porta);
-                    up.setVisible(true);//Torna-a visível
+            if(!txtCoordX.equals("")&&!txtCoordY.equals("")){
+                String resp = conect.autentica(txtLogin.getText(), new String(txtSenha.getPassword()), txtCoordX.getText(), txtCoordY.getText());
+                if (resp!=null){
+                    //Se for verdadeiro cria-se uma instancia para a tela de update de dados do paciente
+                    String[] aux = resp.split("#");
+                    
+                    try{                    
+                        UpdateSensor up = new UpdateSensor(parent, true, aux[0], aux[1],endereco, ""+porta, aux[2], aux[3]);
+                        up.setVisible(true);//Torna-a visível
+                        setVisible(false);
+                    }catch(ArrayIndexOutOfBoundsException e){
+                        UpdateSensor up = new UpdateSensor(parent, true, aux[0], aux[1], endereco, ""+porta);
+                        up.setVisible(true);//Torna-a visível
+                    }
+                    dispose();
+                }else{
+                    JOptionPane.showMessageDialog(null, "Favor tentar novamente, login inexistente!");
                 }
-                dispose();
             }else{
-                JOptionPane.showMessageDialog(null, "Favor tentar novamente, login inexistente!");
+                JOptionPane.showMessageDialog(null, "Favor indicar a localização!");
             }
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(null, "Erro na conexão!");
@@ -276,7 +285,7 @@ public class LoginSensor extends javax.swing.JDialog {
     private ConectionSensor conect;//responsável pela conexão
     
     //metodo que inicia a variavel de conexão
-    private void init() throws IOException {
+    private void conecta() throws IOException {
         conect = new ConectionSensor(endereco, porta);
         //conect.conectar();
     }
