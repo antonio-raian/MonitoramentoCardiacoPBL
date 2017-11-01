@@ -22,7 +22,7 @@ import java.util.Timer;
 //Controlador do sistema, onde é armazenada as informações dos pacientes e dos médicos
 public class ControllerNuvem {
     private LinkedList<PacienteNuvem> pacientes; //Lista q armazena todos os pacientes com sensores
-    private LinkedList<String> emRisco; //Lista que armazena nick e nome dos pacientes em risco
+    private LinkedList<String> historico; //Lista que armazena nick e nome dos pacientes em risco
     private LinkedList<MedicoNuvem> medicos; //Lista que armazena os médicos
     private LinkedList<Borda> bordas; //Lista que armazena os servidores de bordas
     private Timer timer = new Timer();//Thread responsável por atualizar altomaticamente
@@ -32,7 +32,7 @@ public class ControllerNuvem {
     public ControllerNuvem() throws IOException, ClassNotFoundException{
         //Instancia de uma nova lista de prioridade e a criação de um comparador para a mesma
         pacientes = new LinkedList<>();//Inicia a lista de pacientes
-        emRisco = new LinkedList<>();//Inicia lista de pacientes em risco
+        historico = new LinkedList<>();//Inicia lista de pacientes em risco
         medicos = new LinkedList<>();//Instancia de uma nova lista de medicos
         bordas = new LinkedList<>();//Instancia de uma nova lista de servidores de borda
         init();
@@ -45,8 +45,8 @@ public class ControllerNuvem {
         if(!existPaciente(nick)){//Verifica se o nick já existe no sistema
             p = new PacienteNuvem(nick, nome, senha, 0, 0, 0, 0);
             pacientes.add(p);
-            if(prioridade(p)&&!emRisco.contains(p.getNick())){
-                emRisco.add(p.getNick());
+            if(prioridade(p)&&!historico.contains(p.getNick())){
+                historico.add(p.getNick());
             }
             salvarArquivo("Pacientes.txt", pacientes);
             return "CADASTRADO";
@@ -63,8 +63,8 @@ public class ControllerNuvem {
                 p.setSistole(Integer.parseInt(sistole));
                 p.setDiastole(Integer.parseInt(diastole));
                 p.setPrioridade(prioridade(p));
-                if(prioridade(p)&&!emRisco.contains(p.getNick())){
-                    emRisco.add(p.getNick());
+                if(prioridade(p)&&!historico.contains(p.getNick())){
+                    historico.add(p.getNick());
                 }
                 salvarArquivo("Pacientes.txt", pacientes);
                 return true;
@@ -86,10 +86,10 @@ public class ControllerNuvem {
     
     public String alocarPaciente(double x, double y){
         String menorDistancia = null;
-        double menor = Math.sqrt(Math.pow(bordas.get(0).getCordenadaX()-x,2)+Math.pow(bordas.get(0).getCordenadaY()-y,2));;
-        menorDistancia = bordas.get(0).getEndereco()+"#"+bordas.get(0).getPorta();
-        double valor;
         if(!bordas.isEmpty()){
+            double menor = Math.sqrt(Math.pow(bordas.get(0).getCordenadaX()-x,2)+Math.pow(bordas.get(0).getCordenadaY()-y,2));;
+            menorDistancia = bordas.get(0).getEndereco()+"#"+bordas.get(0).getPorta();
+            double valor;        
             for(Borda b:bordas){
                 valor = Math.sqrt(Math.pow(b.getCordenadaX()-x,2)+Math.pow(b.getCordenadaY()-y,2));
                 if(valor<menor){
@@ -103,7 +103,8 @@ public class ControllerNuvem {
     public String autenticaSensor(String nick, String senha, String x, String y) {
         for(PacienteNuvem p:pacientes){
             if(p.getNick().equals(nick)&&p.getSenha().equals(senha))
-                return p.getNick()+"#"+p.getNome()+"#"+alocarPaciente(Integer.parseInt(x), Integer.parseInt(y));
+                p.setBorda(alocarPaciente(Integer.parseInt(x), Integer.parseInt(y)));
+                return p.getNick()+"#"+p.getNome()+"#"+p.getBorda();
         }
         
         return null;
@@ -252,9 +253,9 @@ public class ControllerNuvem {
     public void setPacienteRisco(String pacientes) throws IOException {
         if(!pacientes.equals("null")){
             String[] str = pacientes.split("/");
-            emRisco.add(str[0]);
+            historico.add(str[0]);
             atualizarDadosPaciente(str[0], str[2], str[3], str[4], str[5]);
-            salvarArquivo("Em_Risco.txt", emRisco);
+            salvarArquivo("Historico.txt", historico);
         }
     }
     
@@ -295,12 +296,12 @@ public class ControllerNuvem {
             
         }
         
-        arq = new File(diretorio, "Em_Risco.txt");//Cria Arquivo com o titulo "EM_RISCO"
+        arq = new File(diretorio, "Historico.txt");//Cria Arquivo com o titulo "EM_RISCO"
         if(!arq.exists()){//Verifica se existe
             arq.createNewFile();//Se não existe cria um novo arquivo
         }
         try {
-            emRisco = lerArquivo(arq);
+            historico = lerArquivo(arq);
         } catch (IOException ex) {
             
         }
