@@ -72,7 +72,7 @@ public class AtividadeServidor extends Thread{
                             listarSensores();
                             break;
                         case "GET_PACIENTE":
-                            getPacienteUDP(array[2]);
+                            getPaciente(array[2]);
                             break;
                     }
                     break;
@@ -88,7 +88,7 @@ public class AtividadeServidor extends Thread{
                             listarPrioritarios();
                             break;
                         case "GET_PACIENTE":
-                            getPacienteTCP(array[2]);
+                            getPaciente(array[2]);
                             break;
                         default:
                             break;
@@ -147,8 +147,8 @@ public class AtividadeServidor extends Thread{
         clienteUDP.send(sendResult);;//Envia o pacote criado para o cliente
     }
     
-    //Metodo que solicita um paciente pelo nick
-    private void getPacienteUDP(String nick) throws IOException{
+     //Metodo que solicita um paciente pelo nick
+    private void getPaciente(String nick) throws IOException{
         String s = ctrl.getPaciente(nick);//O metodo retorna uma string com todas as informações do paciente separada por #
         if(s==null){//Se essa String for nula, não encontrou o paciente
             s = "$FALHA$";//E o retorno é FALHA
@@ -179,18 +179,6 @@ public class AtividadeServidor extends Thread{
             saida.writeObject("$INEXISTENTE$");//Envia uma mensagem de INEXISTENTE ao cliente
         }else{//Se não for nula
             saida.writeObject("$LOGON$");//Envia uma mensagem de LOGON ao cliente
-        }
-        saida.close();//Encerra a conexão com o cliente
-    }
-    
-    //Metodo que solicita um paciente a partir de um nick
-    private void getPacienteTCP(String nick) throws IOException{
-        saida = new ObjectOutputStream(clienteTCP.getOutputStream());//Estabelece uma forma de conectar-se ao cliente
-        String s = ctrl.getPaciente(nick);//Solicita o paciente pelo nick
-        if(s==null){//Se a resposta for nula
-            saida.writeObject("$NAO_ENCONTRADO$");//Envia uma mensagem de NAO_ENCONTRADO ao cliente
-        }else{
-            saida.writeObject(s);//Envia uma string com as informações do paciente para o cliente
         }
         saida.close();//Encerra a conexão com o cliente
     }
