@@ -50,8 +50,14 @@ public class Conection {
     public String enviaPacientes(String info) throws IOException, ClassNotFoundException{
         conectar();
         saida = new ObjectOutputStream(server.getOutputStream());
-        saida.writeObject("SERVER#SEND#"+info);
-        String s = (String) entrada.readObject();
+        String s = null;
+        if(!info.equals("")){
+            saida.writeObject("SERVER#SEND#"+info);
+        }else{
+            saida.writeObject("SERVER#SEND#null");
+        }
+        entrada  = new ObjectInputStream(server.getInputStream());
+        s = (String) entrada.readObject();
         desconectar();
         return s;
     }
@@ -65,7 +71,6 @@ public class Conection {
     //Metodo responsavel por fechar conexão com o servidor
     public void desconectar() throws IOException{
         saida.close();
-        entrada.close();
         server.close();
     }    
 }

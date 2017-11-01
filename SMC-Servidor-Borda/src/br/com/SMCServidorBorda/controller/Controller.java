@@ -14,9 +14,6 @@ import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Stack;
 import java.util.Timer;
-import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -26,7 +23,6 @@ import java.util.logging.Logger;
 public class Controller {
     private PriorityQueue<Paciente> pacientes; //Lista q armazena todos os pacientes com sensores
     private LinkedList<Medico> medicos; //Lista que armazena os médicos
-    private Stack<String> risco;
     Timer timer = new Timer();//Thread responsável por atualizar altomaticamente
     private Conection conexao;
     
@@ -51,8 +47,7 @@ public class Controller {
             }
         }); //Inicia a lista de pacientes
         medicos = new LinkedList<>();//Instancia de uma nova lista de medicos
-        risco = new Stack<>();
-        enviaInfo(host, porta);
+        conexao = new Conection(host, porta);
     }
     
     //Metodos dos sensores---------------------------
@@ -68,15 +63,15 @@ public class Controller {
     }
     
     //Metodo pra atualizar as informações do Paciente
-    public boolean atualizarSensor(String nick, String nome, String movimento, String ritmo, String sistole, String diastole) throws IOException {
+    public boolean atualizarSensor(String nick, String nome, String movimento, String ritmo, String sistole, String diastole) throws IOException, ClassNotFoundException {
         //Cria um novo paciente com as informações passadas
         Paciente p = new Paciente(nick, nome, Integer.parseInt(movimento), Integer.parseInt(ritmo), Integer.parseInt(sistole), Integer.parseInt(diastole));
         if(prioridade(p)){
-            risco.push(p.getNick()+" - "+p.getNome());
             p.setPrioridade(true);
+            sendPacienteRisco(p);
         }else{
             p.setPrioridade(false);
-        }        
+        }
         if(pacientes.contains(p)){//Verifica se já existe um paciente com mesmo nick
             pacientes.remove(p);//Remove as informações anteriores do paciente            
             pacientes.add(p);//E adiciona as novas
@@ -84,15 +79,11 @@ public class Controller {
         }else{
             pacientes.add(p);
             return true;
-        }
+        }  
     }
     
-    public String getPacientesRisco(){
-        String s="";
-        while(!risco.isEmpty()){
-            s+=risco.pop()+"#";
-        }
-        return s;
+    public void sendPacienteRisco(Paciente p) throws IOException, ClassNotFoundException{
+        conexao.enviaPacientes(p.getNick()+"/"+p.getNome()+"/"+p.getMovimento()+"/"+p.getRitmo()+"/"+p.getSistole()+"/"+p.getDiastole());
     }
     //----------------------------------
     
@@ -209,22 +200,5 @@ public class Controller {
             i++;
         }
         return todos;
-    }
-    
-    //THREAD QUE ATUALIZA AS INFORMAÇÕES DOS USUÁRIOS EM RISCO DA NUVEM
-    private void enviaInfo(String host, String porta){
-        timer.scheduleAtFixedRate(new TimerTask() {
-            public void run() {
-                conexao = new Conection(host, porta);
-                try {
-                    conexao.enviaPacientes(getPacientesRisco());
-                } catch (IOException ex) {
-                    Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                
-            }
-        }, 30000, 20000);
     }
 }

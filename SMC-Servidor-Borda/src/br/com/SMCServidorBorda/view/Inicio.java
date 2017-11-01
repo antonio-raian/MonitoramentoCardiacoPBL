@@ -30,7 +30,6 @@ public class Inicio extends javax.swing.JDialog {
     public Inicio(java.awt.Frame parent, boolean modal) throws IOException {
         super(parent, modal);
         initComponents();
-        conecta();
     }
 
     /**
@@ -275,7 +274,9 @@ public class Inicio extends javax.swing.JDialog {
     private void btnStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStartActionPerformed
         this.ctrl = new Controller(txtEndNuvem.getText(), txtPortaNuvem.getText());//instancia de um novo controlador
         String portaLocal = txtPortaLocal.getText(), cordeX = txtCoordX.getText(),cordeY = txtCoordY.getText();
+        
         try {
+            conecta();
             if(!portaLocal.equals("") && !cordeX.equals("") && !cordeY.equals("")){
                 String resp = conexao.novaBorda(InetAddress.getLocalHost().getHostAddress(), portaLocal, cordeX, cordeY);
             JOptionPane.showMessageDialog(null, resp);

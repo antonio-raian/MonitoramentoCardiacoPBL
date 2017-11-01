@@ -97,6 +97,8 @@ public class AtividadeServidor extends Thread{
             AtividadeServidor.currentThread().interrupt();//Interrompe a Thread, fazendo ela deixar de existir
         } catch (IOException ex) {
             Logger.getLogger(AtividadeServidor.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(AtividadeServidor.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -117,7 +119,7 @@ public class AtividadeServidor extends Thread{
         System.out.println("Dados Salvos: "+nick+", "+nome+", "+movimento+", "+ritmo+", "+sistole+"/"+diastole);
     }
     //Metodo que se conecta com o Controlador para atualizar informações de um paciente
-    private void atualizarSensor(String nick, String nome, String movimento, String ritmo, String sistole, String diastole) throws IOException {
+    private void atualizarSensor(String nick, String nome, String movimento, String ritmo, String sistole, String diastole) throws IOException, ClassNotFoundException {
         //Metodo de atualização retorna true ou false
         boolean p = ctrl.atualizarSensor(nick, nome, movimento, ritmo, sistole, diastole);
         String s;
