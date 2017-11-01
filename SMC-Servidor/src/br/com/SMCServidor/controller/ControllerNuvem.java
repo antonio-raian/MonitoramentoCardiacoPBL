@@ -3,22 +3,18 @@ package br.com.SMCServidor.controller;
 import br.com.SMCServidor.model.Borda;
 import br.com.SMCServidor.model.MedicoNuvem;
 import br.com.SMCServidor.model.PacienteNuvem;
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.Socket;
 import java.util.LinkedList;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -37,7 +33,7 @@ public class ControllerNuvem {
     public ControllerNuvem() throws IOException, ClassNotFoundException{
         //Instancia de uma nova lista de prioridade e a criação de um comparador para a mesma
         pacientes = new LinkedList<>();//Inicia a lista de pacientes
-        emRisco = new LinkedList<String>();//Inicia lista de pacientes em risco
+        emRisco = new LinkedList<>();//Inicia lista de pacientes em risco
         medicos = new LinkedList<>();//Instancia de uma nova lista de medicos
         bordas = new LinkedList<>();//Instancia de uma nova lista de servidores de borda
         init();
@@ -50,6 +46,10 @@ public class ControllerNuvem {
         if(!existPaciente(nick)){//Verifica se o nick já existe no sistema
             p = new PacienteNuvem(nick, nome, senha, 0, 0, 0, 0);
             pacientes.add(p);
+            if(prioridade(p)&&!emRisco.contains(p.getNick())){
+                emRisco.add(p.getNick());
+            }
+            salvarArquivo("Pacientes.txt", pacientes);
             return "CADASTRADO";
         }
         return null;//retorna a borda
@@ -64,6 +64,10 @@ public class ControllerNuvem {
                 p.setSistole(Integer.parseInt(sistole));
                 p.setDiastole(Integer.parseInt(diastole));
                 p.setPrioridade(prioridade(p));
+                if(prioridade(p)&&!emRisco.contains(p.getNick())){
+                    emRisco.add(p.getNick());
+                }
+                salvarArquivo("Pacientes.txt", pacientes);
                 return true;
             }
         }
@@ -101,18 +105,20 @@ public class ControllerNuvem {
             if(p.getNick().equals(nick)&&p.getSenha().equals(senha))
                 return p.getNick()+"#"+p.getNome()+"#"+alocarPaciente(Integer.parseInt(x), Integer.parseInt(y));
         }
+        
         return null;
     }
 
     //----------------------------------
      //Metodos dos medicos----------------------------
     //Metodo que armazena o médico no sistema
-    public MedicoNuvem salvarMedico(String nome, String login, String senha){
+    public MedicoNuvem salvarMedico(String nome, String login, String senha) throws IOException{
         MedicoNuvem m = null;
         if(!existMedico(login)){//Verifica se já existe esse login no sistema
             m = new MedicoNuvem(nome, login, senha);
             medicos.add(m);//Adiciona o médico à lista de medicos cadastrados
         }
+        salvarArquivo("Medicos.txt", medicos);
         return m;
     }
     
@@ -243,42 +249,61 @@ public class ControllerNuvem {
         return borda;
     }
 
-    public void setPacientesRisco(String pacientes) {
-        String[] str = pacientes.split("#");
-        for(String s:str){
-            emRisco.add(s);
+    public void setPacienteRisco(String pacientes) throws IOException {
+        if(!pacientes.equals("null")){
+            String[] str = pacientes.split("/");
+            emRisco.add(str[0]);
+            atualizarDadosPaciente(str[0], str[2], str[3], str[4], str[5]);
+            salvarArquivo("Em_Risco.txt", emRisco);
         }
     }
     
     //Persistencia-----------------
     //Metodo que lê os arquivos e carrega as informações na memória flash
-    private void init() throws IOException, ClassNotFoundException{
+    private void init() throws ClassNotFoundException, IOException{
         diretorio.mkdir();//Cria um diretório
         
         File arq = new File(diretorio, "Bordas.txt");//Cria Arquivo com o titulo "BORDAS"
         if(!arq.exists()){//Verifica se existe
             arq.createNewFile();//Se não existe cria um novo arquivo
-        }else{
-            lerArquivo(arq, bordas);
         }
+        try{
+            bordas = lerArquivo(arq);
+            verificaBordas();
+        }catch(IOException e){
+            
+        }
+        
         
         arq = new File(diretorio, "Pacientes.txt");//Cria Arquivo com o titulo "PACIENTES"
         if(!arq.exists()){//Verifica se existe
             arq.createNewFile();//Se não existe cria um novo arquivo
-        }else
-            lerArquivo(arq, pacientes);
+        }
+        try {
+            pacientes = lerArquivo(arq);
+        } catch (IOException ex) {
+            
+        }
         
         arq = new File(diretorio, "Medicos.txt");//Cria Arquivo com o titulo "MEDICOS"
         if(!arq.exists()){//Verifica se existe
             arq.createNewFile();//Se não existe cria um novo arquivo
-        }else
-            lerArquivo(arq, medicos);
+        }
+        try {
+            medicos = lerArquivo(arq);
+        } catch (IOException ex) {
+            
+        }
         
         arq = new File(diretorio, "Em_Risco.txt");//Cria Arquivo com o titulo "EM_RISCO"
         if(!arq.exists()){//Verifica se existe
             arq.createNewFile();//Se não existe cria um novo arquivo
-        }else
-            lerArquivo(arq, emRisco);
+        }
+        try {
+            emRisco = lerArquivo(arq);
+        } catch (IOException ex) {
+            
+        }
     }
     
     private void salvarArquivo(String nome, LinkedList dados) throws FileNotFoundException, IOException{
@@ -289,24 +314,22 @@ public class ControllerNuvem {
         oos.close();
     }
     
-    private void lerArquivo(File arq, LinkedList lista) throws IOException, ClassNotFoundException{
+    private LinkedList lerArquivo(File arq) throws IOException, ClassNotFoundException{
         ObjectInputStream ois = new ObjectInputStream(new FileInputStream(arq));//Usa o Stream pra ler os arquivos
-        lista = (LinkedList<Borda>) ois.readObject();//Lê e armazena a lista na memória flash
+        LinkedList lista =  (LinkedList) ois.readObject();//Lê e armazena a lista na memória flash
+        ois.close();
+        return lista;
     }
     
-    //THREAD QUE SALVA OS DADOS NOS ARQUIVOS A CADA 40 SEGUNDOS
-    private void enviaInfo(String host, String porta){
-        timer.scheduleAtFixedRate(new TimerTask() {
-            public void run() {
-                try {
-                    salvarArquivo("Bordas.txt", bordas);
-                    salvarArquivo("Pacientes.txt", pacientes);
-                    salvarArquivo("Medicos.txt", medicos);
-                    salvarArquivo("Em_Risco.txt", emRisco);
-                } catch (IOException ex) {
-                    System.out.println("Salvou não!");
-                }                
+    private void verificaBordas() throws IOException{
+        for(Borda b:bordas){
+            try{
+                new Socket(b.getEndereco(), Integer.parseInt(b.getPorta()));
+                System.out.println("Borda Ativa!");
+            }catch(IOException e){
+                bordas.remove(b);
             }
-        }, 30000, 40000);
+        }  
+        salvarArquivo("Bordas.txt", bordas);
     }
 }

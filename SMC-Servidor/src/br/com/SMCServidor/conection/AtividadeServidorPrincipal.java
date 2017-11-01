@@ -70,7 +70,7 @@ public class AtividadeServidorPrincipal extends Thread{
                             removeBorda(array[2]);
                             break;
                         case "SEND":
-                            pacientesRisco(array[2]);
+                            pacienteRisco(array[2]);
                             break;
                     }
                     break;
@@ -88,6 +88,8 @@ public class AtividadeServidorPrincipal extends Thread{
                         case "GET_PACIENTE":
                             getPaciente(array[2]);
                             break;
+                        case "MUDARCOORDENADA":
+                            mudarcoordenada(array[2], array[3],array[4]);
                     }
                     break;
                 case "MEDICO"://Caso a primeira informação passada seja SENSOR
@@ -227,11 +229,21 @@ public class AtividadeServidorPrincipal extends Thread{
         saida.close();//Encerra a conexão com o cliente
     }
     
-    private void pacientesRisco(String pacientes) throws IOException {
-        ctrl.setPacientesRisco(pacientes);
+    private void pacienteRisco(String pacientes) throws IOException {
+        ctrl.setPacienteRisco(pacientes);
         saida = new ObjectOutputStream(clienteTCP.getOutputStream());//Estabelece uma forma de conectar-se ao cliente
         saida.writeObject("Lista Salva!");//envia uma string com o nick e o nome dos pacientes em risco separados por "#"
         
         saida.close();//Encerra a conexão com o cliente
+    }
+
+    private void mudarcoordenada(String nick, String coordenadaX, String coordenadaY) throws IOException {
+        String c = ctrl.atualizarLocalSensor(nick, coordenadaX, coordenadaY);
+        saida = new ObjectOutputStream(clienteTCP.getOutputStream());
+        if(c !=null)
+            saida.writeObject(c);
+        else
+            saida.writeObject("FALHA");
+        saida.close();
     }
 }

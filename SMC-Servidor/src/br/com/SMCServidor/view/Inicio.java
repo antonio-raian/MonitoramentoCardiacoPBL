@@ -190,6 +190,8 @@ public class Inicio extends javax.swing.JDialog {
         try {
             serverTCP.stop();//acessa ao metodo da thread
             serverUDP.stop();//acessa ao metodo da thread
+            btnConect.setVisible(false);
+            listConect.setVisible(false);
             lbConexao.setText("Desconectado");//muda informação da tela para Desconectado
         } catch (IOException | NullPointerException ex) {
             //mostra mensagem caso não tenha servidores ativos

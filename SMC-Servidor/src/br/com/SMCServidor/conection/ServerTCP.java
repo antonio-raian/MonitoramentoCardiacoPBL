@@ -36,7 +36,7 @@ public class ServerTCP implements Runnable{
                 System.out.println("Mais um cliente TCP atendido!");
             }
         }catch(Exception e){
-            System.exit(1);
+            System.out.println(e.getMessage());
         }
     }
     
