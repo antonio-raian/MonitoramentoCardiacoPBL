@@ -143,7 +143,6 @@ public class LoginMedico extends javax.swing.JDialog {
     private void btnLogarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogarActionPerformed
         try {
             //verifica a autenticidade dos dados informados
-            conect.conectarTCP();
             if (conect.autentica(txtLogin.getText(), new String(txtSenha.getPassword()))){
                 //Se for verdadeiro cria-se uma instancia para a tela inicial do sistema dos médicos
                 TelaInicial tl = new TelaInicial(parent, true, endereco, porta);
