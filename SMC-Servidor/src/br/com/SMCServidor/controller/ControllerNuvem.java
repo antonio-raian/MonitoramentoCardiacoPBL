@@ -107,9 +107,10 @@ public class ControllerNuvem {
     //Metodo que faz a autenticação do sensor e encontra a melhor borda
     public String autenticaSensor(String nick, String senha, String x, String y) {
         for(PacienteNuvem p:pacientes){
-            if(p.getNick().equals(nick)&&p.getSenha().equals(senha))
+            if(p.getNick().equals(nick)&&p.getSenha().equals(senha)){
                 p.setBorda(alocarPaciente(Integer.parseInt(x), Integer.parseInt(y)));//Encontra a melhor borda
                 return p.getNick()+"#"+p.getNome()+"#"+p.getBorda();
+            }
         }
         
         return null;
